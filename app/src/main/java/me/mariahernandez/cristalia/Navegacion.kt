@@ -13,11 +13,14 @@ object Rutas {
     const val INICIO = "inicio"             //
     const val MENU = "menu"                 // pantalla anterior (Menu sebas)
     const val LOGIN = "login"               // pantalla de login (Login sebas)
+
+                                            // Otras pantallas que haga sebas
     const val CELDA_UNITARIA = "celda_unitaria"        // Pantalla celda unitaria
 }
 
 @Composable
 fun AppNavigation() {
+
     val navController = rememberNavController()
 
     NavHost(
@@ -27,8 +30,10 @@ fun AppNavigation() {
 
         // PROVISIONAL PASA DE INICIO A CELDA UNITARIA     (DEBE PASAR POR INICIO -> MENU -> CELDA UNITARIA)
         composable(Rutas.INICIO) {
+
+            // Ejecuta la función que recibe como parámetro una lambda (Acción de navegar)
             CristaliaSplashScreen(
-                onEnter = {
+                onEnter = {                                                  // lambda que no devuelve nada y no recibe nada. Por ello entra como parametro en esa funcion en onEnter : () -> Unit
                     navController.navigate(Rutas.CELDA_UNITARIA)
                 }
             )

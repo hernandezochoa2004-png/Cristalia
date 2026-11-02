@@ -25,15 +25,17 @@ import io.github.sceneview.rememberCameraNode
  */
 @Composable
 fun Visor3D(rutaGlb: String, modifier: Modifier = Modifier) {
-    val engine = rememberEngine()
-    val modelLoader = rememberModelLoader(engine)
-    val nodos = rememberNodes()
+
+    val engine = rememberEngine()                         // Dibuja los gráficos 3D
+    val modelLoader = rememberModelLoader(engine)         // Lee las imagenes .glb
+    val nodos = rememberNodes()                           // Nodos que al inicio están vacío y son ocupados por el modelo
 
     // Cámara alejada del modelo (z mayor = más lejos)
     val cameraNode = rememberCameraNode(engine) {
         position = Position(x = 0f, y = 0f, z = 3f)
     }
 
+    // Sirve para borrar un modelo que estaba en escena y se quiere pasar a uno nuevo. Ej: SCC -> FCC
     LaunchedEffect(rutaGlb) {
         nodos.clear()
         nodos.add(
@@ -45,13 +47,14 @@ fun Visor3D(rutaGlb: String, modifier: Modifier = Modifier) {
         )
     }
 
+    // Visor que se ve en pantalla
     Scene(
         modifier = modifier,
         engine = engine,
         modelLoader = modelLoader,
         childNodes = nodos,
         cameraNode = cameraNode,
-        cameraManipulator = rememberCameraManipulator(
+        cameraManipulator = rememberCameraManipulator(             // Permite girar el modelo con el dedo
             orbitHomePosition = cameraNode.worldPosition,
             targetPosition = Position(x = 0f, y = 0f, z = 0f)
         )
@@ -59,18 +62,23 @@ fun Visor3D(rutaGlb: String, modifier: Modifier = Modifier) {
 }
 
 /** Copia un GLB de assets a la carpeta Descargas (sin permisos en Android 10+). */
+
+// Para descargar archivos, sólo si la persona inició sesión
 fun guardarGlbEnDescargas(context: Context, rutaAsset: String): Boolean {
     return try {
-        val nombre = File(rutaAsset).name
+        val nombre = File(rutaAsset).name          // De "modelos/celda.glb" saca solo "celda.glb".
         val valores = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, nombre)
-            put(MediaStore.Downloads.MIME_TYPE, "model/gltf-binary")
-            put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            put(MediaStore.Downloads.DISPLAY_NAME, nombre)                             // nombre:celda.glb
+            put(MediaStore.Downloads.MIME_TYPE, "model/gltf-binary")                   // tipo: modelo glb
+            put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)   // carpeta:descargas
         }
+
+        // Crea el archivo vacío.
         val uri = context.contentResolver.insert(
             MediaStore.Downloads.EXTERNAL_CONTENT_URI, valores
         ) ?: return false
 
+        // Copia el contenido
         context.assets.open(rutaAsset).use { entrada ->
             context.contentResolver.openOutputStream(uri)?.use { salida ->
                 entrada.copyTo(salida)
@@ -81,3 +89,4 @@ fun guardarGlbEnDescargas(context: Context, rutaAsset: String): Boolean {
         false
     }
 }
+

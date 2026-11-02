@@ -70,11 +70,22 @@ dependencies {
         // 2. MENÚ
 
 
+
+
+
         // 3. CELDA UNITARIA
+
+        // Sceneview
         implementation("io.github.sceneview:sceneview:2.3.3")
+
+        // -----------------------------------------------------------     (Navegación entre pantallas)
         implementation("androidx.navigation:navigation-compose:2.8.0")
+
+        // Sceneview
         implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
         implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
+
+        // Iconos
         implementation("androidx.compose.material:material-icons-extended")
 
 

@@ -35,7 +35,7 @@ enum class TipoCelda(
     val subtitulo: String,
     val titulo: String,
     val archivoGlb: String,          // ruta dentro de app/src/main/assets/
-    val archivoGlbConteo: String,     // <-- NUEVO: el GLB de la zona amarilla
+    val archivoGlbConteo: String,     // glb de conteo
     val items: List<ItemConteo>,
     val resumen: String,
     val terminos: List<TerminoFormula>,
@@ -44,8 +44,8 @@ enum class TipoCelda(
     SC(
         sigla = "SC", subtitulo = "Cúbica Simple",
         titulo = "SC — Cúbica Simple (Simple Cubic)",
-        archivoGlb = "models/celdaunitaria/SC_centrada_fix.glb",
-        archivoGlbConteo = "models/celdaunitaria/1atom_centrado.glb",   // <-- NUEVO
+        archivoGlb = "models/celdaunitaria/SC_centrada_fix.glb",         // Ruta celda
+        archivoGlbConteo = "models/celdaunitaria/1atom_centrado.glb",   // Ruta conteo
         items = listOf(
             ItemConteo("1 esfera hace parte de 8 estructuras cristalinas", "1/8 por celda", Paleta.Cian)
         ),
