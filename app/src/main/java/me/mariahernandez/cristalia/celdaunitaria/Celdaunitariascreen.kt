@@ -51,23 +51,23 @@ import androidx.compose.ui.unit.TextUnit
 
 @Composable
 fun CeldaUnitariaScreen(
-    onVolver: () -> Unit,
-    onIrALogin: () -> Unit,
-    viewModel: CeldaUnitariaViewModel = viewModel()
+    onVolver: () -> Unit,                                            // parametro 1, lambda acción
+    onIrALogin: () -> Unit,                                          // parametro 2, lambda accion
+    viewModel: CeldaUnitariaViewModel = viewModel()                  //parametro 3, objeto de tipo CeldaUnitariaViewModel
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val state by viewModel.uiState.collectAsStateWithLifecycle()     // Al cambiar de tipo (SC -> FCC) avisa a compose para recomponer la pantalla
+    val context = LocalContext.current                               // Da el contexto de la pantalla, que se utilizará más abajo
 
     // Eventos de una sola vez: ir al login o descargar
     LaunchedEffect(Unit) {
-        viewModel.eventos.collect { evento ->
+        viewModel.eventos.collect { evento ->             // Obtiene los eventos del objeto Celdaunitariaviewmodel (login, descargar)
             when (evento) {
-                EventoUi.IrALogin -> onIrALogin()
-                is EventoUi.Descargar -> {
-                    val ok = guardarGlbEnDescargas(context, evento.archivoGlb)
+                EventoUi.IrALogin -> onIrALogin()     // Si el evento es login, ejecuta onIRALogin que es parametro1
+                is EventoUi.Descargar -> {            // Si el evento es descargar, haz esto:
+                    val ok = guardarGlbEnDescargas(context, evento.archivoGlb)  // Devuelve un boolean
                     Toast.makeText(
                         context,
-                        if (ok) "Guardado en Descargas" else "Error al guardar",
+                        if (ok) "Guardado en Descargas" else "Error al guardar",    // Si ok es true, se descargó
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -79,10 +79,10 @@ fun CeldaUnitariaScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Paleta.Fondo)
-            .statusBarsPadding()
-            .verticalScroll(rememberScrollState())
+            .statusBarsPadding()                              // Deja espacio hacia arriba para que no quede pegado a la hora y bateria
+            .verticalScroll(rememberScrollState())    // Permite deslizar hacia abajo el contenido mas largo
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)     // Deja 16 dp de cada elemento de la columna
     ) {
         // ---------- PARTE FIJA (no cambia al tocar SC/BCC/FCC/HCP) ----------
         BarraSuperior(onVolver = onVolver, onIrALogin = onIrALogin)
@@ -115,8 +115,8 @@ fun CeldaUnitariaScreen(
 
         // ---------- PARTE QUE CAMBIA (solo esta sección se actualiza) ----------
         AnimatedContent(
-            targetState = state.tipoSeleccionado,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            targetState = state.tipoSeleccionado,                          // Detecta el cambio de un tipo a otro
+            transitionSpec = { fadeIn() togetherWith fadeOut() },          // Contenido viejo desaparece al mismo tiempo que aparece el nuevo
             label = "seccionTipo"
         ) { tipo ->
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -137,6 +137,7 @@ fun CeldaUnitariaScreen(
     }
 }
 
+// Barra superior
 @Composable
 private fun BarraSuperior(onVolver: () -> Unit, onIrALogin: () -> Unit) {
     Row(
