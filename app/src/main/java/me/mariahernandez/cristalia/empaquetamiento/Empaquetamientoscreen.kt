@@ -361,7 +361,7 @@ private fun PasoDesplegable(
     color: Color,
     contenido: @Composable ColumnScope.() -> Unit
 ) {
-    var expandido by remember { mutableStateOf(true) }
+    var expandido by remember { mutableStateOf(false) }
     val forma = RoundedCornerShape(16.dp)
 
     Column(
@@ -389,14 +389,16 @@ private fun PasoDesplegable(
             ) {
                 Text(numero.toString(), color = color, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
-            Column(Modifier.weight(1f)) {
+            Column {
                 Matematica(titulo, tam = 15.sp)
                 Text(subtitulo, color = Paleta.TextoSecundario, fontSize = 11.sp)
             }
-            Box(Modifier.weight(1f, fill = false)) {
-                Row(Modifier.horizontalScroll(rememberScrollState())) {
-                    Matematica(badge, tam = 12.sp, color = color)
-                }
+            Spacer(Modifier.weight(1f))
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Matematica(badge, tam = 12.sp, color = color)
             }
             Icon(
                 if (expandido) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
@@ -567,7 +569,7 @@ private fun CajaContenido(c: Bloque.Caja) {
 
 @Composable
 private fun SeccionPlegable(s: Bloque.Seccion) {
-    var abierta by remember { mutableStateOf(true) }
+    var abierta by remember { mutableStateOf(false) }
     val forma = RoundedCornerShape(12.dp)
     Column(
         modifier = Modifier

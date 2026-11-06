@@ -48,6 +48,11 @@ fun AppNavigation() {
                 onCeldaUnitariaClick = {
                     navController.navigate(Rutas.CELDA_UNITARIA)
                 },
+
+                onFactorEmpaquetamientoClick = {
+                    navController.navigate(route=Rutas.EMPAQUETAMIENTO)
+                },
+
                 onIrALogin = {
                     navController.navigate(Rutas.LOGIN)
                 }
