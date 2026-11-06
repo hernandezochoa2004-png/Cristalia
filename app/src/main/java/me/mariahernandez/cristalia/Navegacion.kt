@@ -7,6 +7,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import me.mariahernandez.cristalia.celdaunitaria.CeldaUnitariaScreen
 import me.mariahernandez.cristalia.inicio.CristaliaSplashScreen
+import me.mariahernandez.cristalia.empaquetamiento.EmpaquetamientoScreen
+import me.mariahernandez.cristalia.menu.MenuScreen
 
 object Rutas {
 
@@ -16,6 +18,8 @@ object Rutas {
 
                                             // Otras pantallas que haga sebas
     const val CELDA_UNITARIA = "celda_unitaria"        // Pantalla celda unitaria
+
+    const val EMPAQUETAMIENTO = "factor-empaquetamiento"    // Pantalla factor de empaquetamiento
 }
 
 @Composable
@@ -34,13 +38,20 @@ fun AppNavigation() {
             // Ejecuta la función que recibe como parámetro una lambda (Acción de navegar)
             CristaliaSplashScreen(
                 onEnter = {                                                  // lambda que no devuelve nada y no recibe nada. Por ello entra como parametro en esa funcion en onEnter : () -> Unit
-                    navController.navigate(Rutas.CELDA_UNITARIA)
+                    navController.navigate(Rutas.MENU)
                 }
             )
         }
 
         composable(Rutas.MENU) {
-            // TODO: aquí irá la pantalla anterior / menú
+            MenuScreen(
+                onCeldaUnitariaClick = {
+                    navController.navigate(Rutas.CELDA_UNITARIA)
+                },
+                onIrALogin = {
+                    navController.navigate(Rutas.LOGIN)
+                }
+            )
 
         }
 
@@ -54,6 +65,13 @@ fun AppNavigation() {
                 onVolver = { navController.popBackStack() },
                 // Ir al login (sirve tanto para el botón "Iniciar sesión" como para la descarga sin sesión)
                 onIrALogin = { navController.navigate(Rutas.LOGIN) }
+            )
+        }
+
+        composable(route=Rutas.EMPAQUETAMIENTO) {
+            EmpaquetamientoScreen(
+                onVolver = { navController.popBackStack() },
+                onIrALogin = { navController.navigate(route = Rutas.LOGIN)}
             )
         }
     }
