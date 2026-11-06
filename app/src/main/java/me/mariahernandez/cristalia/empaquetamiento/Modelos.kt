@@ -379,66 +379,68 @@ enum class TipoEstructura(
                                 )
                             )
                         ),
-                        Bloque.Imagenes(listOf("emp_hcp_angulo_60", "emp_hcp_corte_30"))
-                    )
-                ),
-                // ----- Despeje de b -----
-                Bloque.Caja(
-                    titulo = "Despeje de b", color = Cian,
-                    bloques = listOf(
-                        Bloque.Fila(t("cos(30°) ="), fr(t("a / 2"), t("b"))),
-                        Bloque.Fila(t("b ="), fr(t("a"), t("2 · cos(30°)"))),
-                        Bloque.Fila(
-                            t("b ="),
-                            fr(t("a"), seq(t("2 · ("), fr(raiz("3"), t("2")), t(")"))),
-                            comentario = "(cancela 2)"
-                        ),
-                        Bloque.Fila(t("Resultado b:"), seq(t("b = "), fr(t("a"), raiz("3"))), estilo = EstiloFila.Cian)
-                    )
-                ),
-                // ----- Metiendo b en la ecuación B -----
-                Bloque.Caja(
-                    titulo = "Metiendo b en Ecuación B", color = Magenta,
-                    bloques = listOf(
-                        Bloque.Fila(
-                            t("Ecuación B:"),
-                            seq(sup("a", "2"), t(" = "), sup("b", "2"), t(" + "), sup(seq(t("(c / 2)")), "2"))
-                        ),
-                        Bloque.Fila(
-                            seq(sup("a", "2"), t(" =")),
-                            seq(
-                                sup(seq(t("("), fr(t("a"), raiz("3")), t(")")), "2"), t(" + "),
-                                sup(seq(t("("), fr("c", "2"), t(")")), "2")
+                        Bloque.Imagenes(listOf("emp_hcp_angulo_60", "emp_hcp_corte_30")),
+
+                        // ----- Despeje de b -----
+                        Bloque.Caja(
+                            titulo = "Despeje de b", color = Cian,
+                            bloques = listOf(
+                                Bloque.Fila(t("cos(30°) ="), fr(t("a / 2"), t("b"))),
+                                Bloque.Fila(t("b ="), fr(t("a"), t("2 · cos(30°)"))),
+                                Bloque.Fila(
+                                    t("b ="),
+                                    fr(t("a"), seq(t("2 · ("), fr(raiz("3"), t("2")), t(")"))),
+                                    comentario = "(cancela 2)"
+                                ),
+                                Bloque.Fila(t("Resultado b:"), seq(t("b = "), fr(t("a"), raiz("3"))), estilo = EstiloFila.Cian)
                             )
                         ),
-                        Bloque.Fila(
-                            seq(sup("a", "2"), t(" =")),
-                            seq(fr(sup("a", "2"), t("3")), t(" + "), fr(sup("c", "2"), t("4"))),
-                            estilo = EstiloFila.Cian
+                        // ----- Metiendo b en la ecuación B -----
+                        Bloque.Caja(
+                            titulo = "Metiendo b en Ecuación B", color = Magenta,
+                            bloques = listOf(
+                                Bloque.Fila(
+                                    t("Ecuación B:"),
+                                    seq(sup("a", "2"), t(" = "), sup("b", "2"), t(" + "), sup(seq(t("(c / 2)")), "2"))
+                                ),
+                                Bloque.Fila(
+                                    seq(sup("a", "2"), t(" =")),
+                                    seq(
+                                        sup(seq(t("("), fr(t("a"), raiz("3")), t(")")), "2"), t(" + "),
+                                        sup(seq(t("("), fr("c", "2"), t(")")), "2")
+                                    )
+                                ),
+                                Bloque.Fila(
+                                    seq(sup("a", "2"), t(" =")),
+                                    seq(fr(sup("a", "2"), t("3")), t(" + "), fr(sup("c", "2"), t("4"))),
+                                    estilo = EstiloFila.Cian
+                                )
+                            )
+                        ),
+                        // ----- Despejando c -----
+                        Bloque.Caja(
+                            titulo = "Despejando para c", color = Cian,
+                            bloques = listOf(
+                                Bloque.Fila(
+                                    seq(sup("c", "2"), t(" =")),
+                                    seq(t("4 · ("), sup("a", "2"), t(" − "), fr(sup("a", "2"), t("3")), t(")"))
+                                ),
+                                Bloque.Fila(
+                                    seq(sup("c", "2"), t(" =")),
+                                    seq(t("4 · "), fr(seq(t("2 "), sup("a", "2")), t("3")))
+                                ),
+                                Bloque.Fila(
+                                    t("Altura c final:", Magenta),
+                                    seq(t("c = "), fr(seq(t("2"), raiz("2")), raiz("3")), t(" a")),
+                                    estilo = EstiloFila.Magenta
+                                )
+                            )
                         )
                     )
                 ),
-                // ----- Despejando c -----
-                Bloque.Caja(
-                    titulo = "Despejando para c", color = Cian,
-                    bloques = listOf(
-                        Bloque.Fila(
-                            seq(sup("c", "2"), t(" =")),
-                            seq(t("4 · ("), sup("a", "2"), t(" − "), fr(sup("a", "2"), t("3")), t(")"))
-                        ),
-                        Bloque.Fila(
-                            seq(sup("c", "2"), t(" =")),
-                            seq(t("4 · "), fr(seq(t("2 "), sup("a", "2")), t("3")))
-                        ),
-                        Bloque.Fila(
-                            t("Altura c final:", Magenta),
-                            seq(t("c = "), fr(seq(t("2"), raiz("2")), raiz("3")), t(" a")),
-                            estilo = EstiloFila.Magenta
-                        )
-                    )
-                ),
+
                 // ----- Volumen final -----
-                Bloque.Caja(
+                Bloque.Seccion(
                     titulo = "Cálculo de Vcelda (Ab · c)", color = Cian,
                     bloques = listOf(
                         Bloque.Fila(t("Fórmula:"), seq(sub("V", "celda"), t(" = Ab · c"))),
