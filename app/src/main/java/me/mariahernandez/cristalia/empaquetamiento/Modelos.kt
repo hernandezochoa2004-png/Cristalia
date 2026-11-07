@@ -159,7 +159,7 @@ enum class TipoEstructura(
             subtitulo = "Volumen total de la celda unitaria",
             badge = seq(sup("x", "3"), t(" = "), fr(t("64"), seq(t("3"), raiz("3"))), t(" "), r3),
             bloques = listOf(
-                Bloque.Imagenes(listOf("emp_bcc_celda", "emp_bcc_diagonal")),
+                Bloque.Imagenes(listOf("imagen1bcc", "imagen2bcc")),
                 Bloque.Columnas(
                     listOf(
                         Bloque.Caja(
@@ -237,7 +237,7 @@ enum class TipoEstructura(
             bloques = listOf(
                 Bloque.Caja(
                     titulo = "Geometría Celda Unitaria FCC", color = Magenta, chip = "x = arista",
-                    bloques = listOf(Bloque.Imagenes(listOf("emp_fcc_geometria")))
+                    bloques = listOf(Bloque.Imagenes(listOf("fcc1")))
                 ),
                 Bloque.Columnas(
                     listOf(
@@ -322,7 +322,7 @@ enum class TipoEstructura(
                 Bloque.Seccion(
                     titulo = "Ab", color = Cian,
                     bloques = listOf(
-                        Bloque.Imagenes(listOf("emp_hcp_hexagono", "emp_hcp_triangulo")),
+                        Bloque.Imagenes(listOf("abajo", "triangulo")),
                         Bloque.Columnas(
                             listOf(
                                 Bloque.Caja(
@@ -363,7 +363,7 @@ enum class TipoEstructura(
                 Bloque.Seccion(
                     titulo = "C — Altura de la Celda", color = Magenta,
                     bloques = listOf(
-                        Bloque.Imagenes(listOf("emp_hcp_altura_1", "emp_hcp_altura_2")),
+                        Bloque.Imagenes(listOf("primero", "segundo")),
                         Bloque.Caja(
                             titulo = null, color = Magenta,
                             bloques = listOf(
@@ -379,7 +379,7 @@ enum class TipoEstructura(
                                 )
                             )
                         ),
-                        Bloque.Imagenes(listOf("emp_hcp_angulo_60", "emp_hcp_corte_30")),
+                        Bloque.Imagenes(listOf("tercero", "cuarto")),
 
                         // ----- Despeje de b -----
                         Bloque.Caja(
