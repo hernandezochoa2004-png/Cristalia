@@ -103,7 +103,7 @@ enum class TipoEstructura(
     SC(
         sigla = "SC", subtitulo = "Cúb. Simple",
         titulo = "SC — Cúbica Simple (Simple Cubic)",
-        archivoGlb = glb("sc"),
+        archivoGlb = "models/empaquetamiento/SCFE_centrado.glb",
         pasoEsfera = Paso(
             titulo = sub("V", "esfera"),
             subtitulo = "Volumen neto ocupado por las esferas",
@@ -139,7 +139,7 @@ enum class TipoEstructura(
     BCC(
         sigla = "BCC", subtitulo = "Cent. Cuerpo",
         titulo = "BCC — Cúbica Centrada en el Cuerpo (Body-Centered Cubic)",
-        archivoGlb = glb("bcc"),
+        archivoGlb = "models/empaquetamiento/BCCFE_centrado.glb",
         pasoEsfera = Paso(
             titulo = sub("V", "esfera"),
             subtitulo = "Volumen neto ocupado por los átomos",
@@ -215,7 +215,7 @@ enum class TipoEstructura(
     FCC(
         sigla = "FCC", subtitulo = "Cent. Caras",
         titulo = "FCC — Cúbica Centrada en las Caras (Face-Centered Cubic)",
-        archivoGlb = glb("fcc"),
+        archivoGlb = "models/empaquetamiento/FCCFE_centrado_android.glb",
         pasoEsfera = Paso(
             titulo = sub("V", "esfera"),
             subtitulo = "Volumen neto ocupado por los átomos",
@@ -298,7 +298,7 @@ enum class TipoEstructura(
     HCP(
         sigla = "HCP", subtitulo = "Hexagonal",
         titulo = "HCP — Hexagonal Compacta (Hexagonal Close-Packed)",
-        archivoGlb = glb("hcp"),
+        archivoGlb = "models/empaquetamiento/modelo_hcp.glb",
         pasoEsfera = Paso(
             titulo = sub("V", "esfera"),
             subtitulo = "Volumen neto ocupado por los átomos",
