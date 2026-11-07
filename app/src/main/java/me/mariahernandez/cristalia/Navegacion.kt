@@ -9,6 +9,7 @@ import me.mariahernandez.cristalia.celdaunitaria.CeldaUnitariaScreen
 import me.mariahernandez.cristalia.inicio.CristaliaSplashScreen
 import me.mariahernandez.cristalia.empaquetamiento.EmpaquetamientoScreen
 import me.mariahernandez.cristalia.menu.MenuScreen
+import me.mariahernandez.cristalia.densidad.DensidadScreen
 
 object Rutas {
 
@@ -20,6 +21,8 @@ object Rutas {
     const val CELDA_UNITARIA = "celda_unitaria"        // Pantalla celda unitaria
 
     const val EMPAQUETAMIENTO = "factor-empaquetamiento"    // Pantalla factor de empaquetamiento
+
+    const val DENSIDAD = "densidad"               // Pantalla menú densidad
 }
 
 @Composable
@@ -53,6 +56,10 @@ fun AppNavigation() {
                     navController.navigate(route=Rutas.EMPAQUETAMIENTO)
                 },
 
+                onDensidadClick = {
+                    navController.navigate(route=Rutas.DENSIDAD)
+                },
+
                 onIrALogin = {
                     navController.navigate(Rutas.LOGIN)
                 }
@@ -78,6 +85,15 @@ fun AppNavigation() {
                 onVolver = { navController.popBackStack() },
                 onIrALogin = { navController.navigate(route = Rutas.LOGIN)}
             )
+        }
+
+        composable (route=Rutas.DENSIDAD) {
+            DensidadScreen(
+                onVolver = { navController.popBackStack() },
+                onIrALogin = { navController.navigate(route = Rutas.LOGIN)},
+
+            )
+
         }
     }
 }
