@@ -10,6 +10,7 @@ import me.mariahernandez.cristalia.inicio.CristaliaSplashScreen
 import me.mariahernandez.cristalia.empaquetamiento.EmpaquetamientoScreen
 import me.mariahernandez.cristalia.menu.MenuScreen
 import me.mariahernandez.cristalia.densidad.DensidadScreen
+import me.mariahernandez.cristalia.huecos.HuecosScreen
 
 object Rutas {
 
@@ -23,6 +24,8 @@ object Rutas {
     const val EMPAQUETAMIENTO = "factor-empaquetamiento"    // Pantalla factor de empaquetamiento
 
     const val DENSIDAD = "densidad"               // Pantalla menú densidad
+
+    const val HUECOS = "huecos"                   // Pantalla menú huecos
 }
 
 @Composable
@@ -60,6 +63,10 @@ fun AppNavigation() {
                     navController.navigate(route=Rutas.DENSIDAD)
                 },
 
+                onHuecosClick = {
+                    navController.navigate(route= Rutas.HUECOS)
+                },
+
                 onIrALogin = {
                     navController.navigate(Rutas.LOGIN)
                 }
@@ -83,17 +90,24 @@ fun AppNavigation() {
         composable(route=Rutas.EMPAQUETAMIENTO) {
             EmpaquetamientoScreen(
                 onVolver = { navController.popBackStack() },
-                onIrALogin = { navController.navigate(route = Rutas.LOGIN)}
+                onIrALogin = { navController.navigate(route = Rutas.LOGIN) }
             )
         }
 
         composable (route=Rutas.DENSIDAD) {
             DensidadScreen(
                 onVolver = { navController.popBackStack() },
-                onIrALogin = { navController.navigate(route = Rutas.LOGIN)},
+                onIrALogin = { navController.navigate(route = Rutas.LOGIN)}
 
             )
 
+        }
+
+        composable( route= Rutas.HUECOS) {
+            HuecosScreen(
+                onVolver = { navController.popBackStack() },
+                onIrALogin = { navController.navigate(route=Rutas.LOGIN) }
+            )
         }
     }
 }

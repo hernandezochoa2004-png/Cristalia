@@ -147,12 +147,7 @@ private fun BarraSuperior(onVolver: () -> Unit, onIniciarSesion: () -> Unit) {
         }
 
         Row(
-            modifier = Modifier
-                .clip(RoundedCornerShape(50))
-                .background(Tarjeta)
-                .border(1.dp, BordeApagado, RoundedCornerShape(50))
-                .padding(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             ChipSuperior(
@@ -168,7 +163,7 @@ private fun BarraSuperior(onVolver: () -> Unit, onIniciarSesion: () -> Unit) {
                 icono = Icons.Filled.Person,
                 colorIcono = TextoApagado,
                 colorTexto = TextoApagado,
-                fondo = Color.Transparent,
+                fondo = BotonFondo,
                 onClick = onIniciarSesion
             )
         }
@@ -188,6 +183,7 @@ private fun ChipSuperior(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
             .background(fondo)
+            .border(1.dp, BordeApagado, RoundedCornerShape(50))
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
