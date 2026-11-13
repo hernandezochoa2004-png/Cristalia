@@ -28,9 +28,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ViewInAr // requiere material-icons-extended
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -55,6 +54,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import me.mariahernandez.cristalia.R
 import me.mariahernandez.cristalia.celdaunitaria.Paleta
 
 // ------------------------------------------------------------------
@@ -132,65 +132,43 @@ fun DensidadScreen(
 @Composable
 private fun BarraSuperior(onVolver: () -> Unit, onIniciarSesion: () -> Unit) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         IconButton(onClick = onVolver) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Volver",
-                tint = Color.White
-            )
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Color.White)
         }
-
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .clip(RoundedCornerShape(50))
+                .background(Paleta.Tarjeta)
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            ChipSuperior(
-                texto = "Cristalia",
-                icono = Icons.Filled.ViewInAr,
-                colorIcono = Paleta.Magenta,
-                colorTexto = Color.White,
-                fondo = BotonFondo,
-                onClick = {}
-            )
-            ChipSuperior(
-                texto = "Iniciar sesión",
-                icono = Icons.Filled.Person,
-                colorIcono = TextoApagado,
-                colorTexto = TextoApagado,
-                fondo = BotonFondo,
-                onClick = onIniciarSesion
-            )
-        }
-    }
-}
+            // Logo + texto cristalia
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Logo Cristalia",
+                    modifier = Modifier.size(20.dp)
+                )
+                Text("Cristalia", color = Color.White, fontWeight = FontWeight.Bold)
+            }
 
-@Composable
-private fun ChipSuperior(
-    texto: String,
-    icono: androidx.compose.ui.graphics.vector.ImageVector,
-    colorIcono: Color,
-    colorTexto: Color,
-    fondo: Color,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(fondo)
-            .border(1.dp, BordeApagado, RoundedCornerShape(50))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 7.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Icon(icono, contentDescription = null, tint = colorIcono, modifier = Modifier.size(14.dp))
-        Text(texto, color = colorTexto, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+            Row(
+                modifier = Modifier.clickable { onIniciarSesion() },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(Icons.Default.AccountCircle, null, tint = Paleta.TextoSecundario, modifier = Modifier.size(18.dp))
+                Text("Iniciar sesión", color = Paleta.TextoSecundario, fontSize = 12.sp)
+            }
+        }
     }
 }
 
