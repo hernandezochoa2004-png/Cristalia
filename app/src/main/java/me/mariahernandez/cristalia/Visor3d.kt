@@ -55,7 +55,7 @@ fun Visor3D(rutaGlb: String, modifier: Modifier = Modifier) {
         childNodes = nodos,
         cameraNode = cameraNode,
         cameraManipulator = rememberCameraManipulator(             // Permite girar el modelo con el dedo
-            orbitHomePosition = cameraNode.worldPosition,
+            orbitHomePosition = Position(x = 0f, y = 0f, z = 3f),
             targetPosition = Position(x = 0f, y = 0f, z = 0f)
         )
     )

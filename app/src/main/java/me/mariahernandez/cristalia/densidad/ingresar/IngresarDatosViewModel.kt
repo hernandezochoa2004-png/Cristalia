@@ -2,10 +2,17 @@ package com.cristalia.ui.ingresardatos
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import me.mariahernandez.cristalia.SessionRepository
+import me.mariahernandez.cristalia.SessionRepositoryFalso
+import me.mariahernandez.cristalia.celdaunitaria.EventoUi
 import com.cristalia.model.EstructuraCristalina
 
 /** Los 3 tabs del mockup: Radio, Volumen, Parámetro a. */
@@ -13,7 +20,6 @@ enum class ModoEntrada { RADIO, VOLUMEN, PARAMETRO_A }
 
 /**
  * Estado completo de la pantalla IngresarDatosScreen.
- * Todo lo que las 3 interfaces de CamposEntradaContent.kt necesitan pintar.
  */
 data class IngresarDatosUiState(
     val estructura: EstructuraCristalina? = null,
@@ -33,39 +39,44 @@ data class IngresarDatosUiState(
     val parametroA: String = "",
     val parametroC: String = "",
 
+    // Sección expandible "Compuestos"
+    val seccionCompuestosExpandida: Boolean = false,
+
     // Resultado
     val densidadCalculada: Double? = null,
     val mensajeError: String? = null
 )
 
-/**
- * b) ViewModel para IngresarDatosScreen.
- *
- * Recibe la estructura seleccionada en el menú (NaCl, Blenda, Wurtzita, CsCl,
- * Fluorita, Antifluorita, Yoduro de cadmio, Rutilo) y maneja el estado de los
- * 3 tabs de entrada, validaciones y el cálculo final de densidad:
- *
- *      ρ = (Z · M) / (Na · V)
- *
- * donde V se obtiene directo (tab Volumen) o se deriva de a (y c) ingresados
- * o calculados desde los radios iónicos.
- */
 class IngresarDatosViewModel(
-    savedStateHandle: SavedStateHandle? = null
+    savedStateHandle: SavedStateHandle? = null,
+    private val session: SessionRepository = SessionRepositoryFalso
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(IngresarDatosUiState())
     val uiState: StateFlow<IngresarDatosUiState> = _uiState.asStateFlow()
 
-    /** c) Punto de entrada: la pantalla llama esto con la estructura que llegó por navegación. */
+    private val _eventos = Channel<EventoUi>(Channel.BUFFERED)
+    val eventos = _eventos.receiveAsFlow()
+
+    /** Carga la estructura si no es la misma que ya está en el estado (evita reset al rotar). */
     fun cargarEstructura(estructura: EstructuraCristalina) {
-        _uiState.update {
-            IngresarDatosUiState(estructura = estructura) // resetea los campos al cambiar de estructura
+        if (_uiState.value.estructura?.id != estructura.id) {
+            _uiState.update {
+                IngresarDatosUiState(estructura = estructura)
+            }
         }
+    }
+
+    fun resetearDensidadCalculada() {
+        _uiState.update { it.copy(densidadCalculada = null) }
     }
 
     fun seleccionarModo(modo: ModoEntrada) {
         _uiState.update { it.copy(modoEntrada = modo, densidadCalculada = null, mensajeError = null) }
+    }
+
+    fun alternarSeccionCompuestos() {
+        _uiState.update { it.copy(seccionCompuestosExpandida = !it.seccionCompuestosExpandida) }
     }
 
     fun actualizarMasaMolar(valor: String) = _uiState.update { it.copy(masaMolar = valor) }
@@ -74,6 +85,17 @@ class IngresarDatosViewModel(
     fun actualizarVolumenCelda(valor: String) = _uiState.update { it.copy(volumenCelda = valor) }
     fun actualizarParametroA(valor: String) = _uiState.update { it.copy(parametroA = valor) }
     fun actualizarParametroC(valor: String) = _uiState.update { it.copy(parametroC = valor) }
+
+    /** Si hay sesión descarga el GLB; si no, manda al login. */
+    fun onDescargarClick(archivoGlb: String) {
+        viewModelScope.launch {
+            if (session.estaLogueado()) {
+                _eventos.send(EventoUi.Descargar(archivoGlb))
+            } else {
+                _eventos.send(EventoUi.IrALogin)
+            }
+        }
+    }
 
     /** Ejecuta el cálculo según el tab activo. Equivalente al botón "Calcular densidad". */
     fun calcularDensidad() {

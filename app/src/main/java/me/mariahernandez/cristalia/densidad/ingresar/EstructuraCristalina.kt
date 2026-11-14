@@ -110,6 +110,7 @@ data class EstructuraCristalina(
                 relacionRadioParametro = RelacionRadioParametro.FCC_ARISTA,
                 z = 4,
                 formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 2(r+ + r-)",
+                modeloGlbAssetPath = "models/densidad/nacl_centrado.glb",
                 compuestosRelacionados = listOf(
                     CompuestoEjemplo("LiF, LiCl, LiBr, LiI", "Haluros alcalinos e hidruros"),
                     CompuestoEjemplo("NaCl, NaBr, NaI", "Haluros alcalinos e hidruros"),
@@ -127,7 +128,8 @@ data class EstructuraCristalina(
                 sistema = SistemaCristalino.CUBICO,
                 relacionRadioParametro = RelacionRadioParametro.FCC_DIAGONAL,
                 z = 4,
-                formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3"
+                formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3",
+                modeloGlbAssetPath = "blenda.glb"
             ),
             EstructuraCristalina(
                 id = "wurtzita",
@@ -138,7 +140,8 @@ data class EstructuraCristalina(
                 relacionRadioParametro = RelacionRadioParametro.NINGUNA,
                 z = 2,
                 requiereParametroC = true,
-                formulaRelacionTexto = "Estructura hexagonal: ingresa a y c directamente (sin fórmula r+/r- aún)"
+                formulaRelacionTexto = "Estructura hexagonal: ingresa a y c directamente (sin fórmula r+/r- aún)",
+                modeloGlbAssetPath = "wurtzita.glb"
             ),
             EstructuraCristalina(
                 id = "cscl",
@@ -148,7 +151,8 @@ data class EstructuraCristalina(
                 sistema = SistemaCristalino.CUBICO,
                 relacionRadioParametro = RelacionRadioParametro.BCC_DIAGONAL,
                 z = 1,
-                formulaRelacionTexto = "Relación r+/r- para celda BCC: parámetro a = 2(r+ + r-)/√3"
+                formulaRelacionTexto = "Relación r+/r- para celda BCC: parámetro a = 2(r+ + r-)/√3",
+                modeloGlbAssetPath = "cscl.glb"
             ),
             EstructuraCristalina(
                 id = "fluorita",
@@ -158,7 +162,8 @@ data class EstructuraCristalina(
                 sistema = SistemaCristalino.CUBICO,
                 relacionRadioParametro = RelacionRadioParametro.FCC_DIAGONAL,
                 z = 4,
-                formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3"
+                formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3",
+                modeloGlbAssetPath = "fluorita.glb"
             ),
             EstructuraCristalina(
                 id = "antifluorita",
@@ -168,7 +173,8 @@ data class EstructuraCristalina(
                 sistema = SistemaCristalino.CUBICO,
                 relacionRadioParametro = RelacionRadioParametro.FCC_DIAGONAL,
                 z = 4,
-                formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3"
+                formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3",
+                modeloGlbAssetPath = "antifluorita.glb"
             ),
             EstructuraCristalina(
                 id = "yoduro_cadmio",
@@ -179,7 +185,8 @@ data class EstructuraCristalina(
                 relacionRadioParametro = RelacionRadioParametro.NINGUNA,
                 z = 1,
                 requiereParametroC = true,
-                formulaRelacionTexto = "Estructura hexagonal en capas: ingresa a y c directamente"
+                formulaRelacionTexto = "Estructura hexagonal en capas: ingresa a y c directamente",
+                modeloGlbAssetPath = "yodurocadmio.glb"
             ),
             EstructuraCristalina(
                 id = "rutilo",
@@ -190,7 +197,8 @@ data class EstructuraCristalina(
                 relacionRadioParametro = RelacionRadioParametro.NINGUNA,
                 z = 2,
                 requiereParametroC = true,
-                formulaRelacionTexto = "Estructura tetragonal: ingresa a y c directamente"
+                formulaRelacionTexto = "Estructura tetragonal: ingresa a y c directamente",
+                modeloGlbAssetPath = "rutilo.glb"
             )
         )
     }
