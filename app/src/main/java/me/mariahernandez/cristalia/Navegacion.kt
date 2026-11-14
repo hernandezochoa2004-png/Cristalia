@@ -16,6 +16,7 @@ import me.mariahernandez.cristalia.densidad.radio.ResultadoDensidadRadioScreen
 import me.mariahernandez.cristalia.huecos.HuecosScreen
 
 import com.cristalia.ui.ingresardatos.ModoEntrada
+import me.mariahernandez.cristalia.densidad.parametroa.ResultadoDensidadParametroAScreen
 import me.mariahernandez.cristalia.densidad.volumen.ResultadoDensidadVolumenScreen
 
 object Rutas {
@@ -38,6 +39,8 @@ object Rutas {
     const val RESULTADO_DENSIDAD_RADIO = "resultado_densidad_radio/{opcionId}/{masaMolar}/{radioCation}/{radioAnion}"
 
     const val RESULTADO_DENSIDAD_VOLUMEN = "resultado_densidad_volumen/{opcionId}/{masaMolar}/{volumenCelda}"
+
+    const val RESULTADO_DENSIDAD_PARAMETRO_A = "resultado_densidad_parametro_a/{opcionId}/{masaMolar}/{parametroA}/{parametroC}"
 }
 
 @Composable
@@ -141,14 +144,19 @@ fun AppNavigation() {
                         }
 
                         ModoEntrada.VOLUMEN -> {
-                            val volumen = estado.volumenCelda.toDoubleOrNull()
+                            val volumen = estado.volumenCm3   // mantisa × 10^exponente, ya en cm³
                             if (volumen != null) {
                                 navController.navigate("resultado_densidad_volumen/$opcionId/$masaMolar/$volumen")
                             }
                         }
 
                         ModoEntrada.PARAMETRO_A -> {
-                            // TODO: pantalla de resultado para el tab "Parámetro a"
+                            val a = estado.parametroA.toDoubleOrNull()
+                            // c solo se pide en hexagonal / tetragonal; en cúbicas se manda 0
+                            val c = if (estructura.requiereParametroC) estado.parametroC.toDoubleOrNull() else 0.0
+                            if (a != null && c != null) {
+                                navController.navigate("resultado_densidad_parametro_a/$opcionId/$masaMolar/$a/$c")
+                            }
                         }
                     }
                 },
@@ -189,6 +197,26 @@ fun AppNavigation() {
                 estructura = estructura,
                 masaMolar = masaMolar,
                 volumenCm3 = volumenCm3,
+                onBack = { navController.popBackStack() },
+                onIrALogin = { navController.navigate(route = Rutas.LOGIN) }
+            )
+        }
+
+        composable(route = Rutas.RESULTADO_DENSIDAD_PARAMETRO_A) { backStackEntry ->
+            val opcionId = backStackEntry.arguments?.getString("opcionId") ?: "nacl"
+            val masaMolar = backStackEntry.arguments?.getString("masaMolar")?.toDoubleOrNull() ?: 0.0
+            val aPm = backStackEntry.arguments?.getString("parametroA")?.toDoubleOrNull() ?: 0.0
+            val cPm = backStackEntry.arguments?.getString("parametroC")?.toDoubleOrNull()?.takeIf { it > 0.0 }
+
+            val estructura = EstructuraCristalina.catalogoEjemplo()
+                .firstOrNull { it.id == opcionId }
+                ?: EstructuraCristalina.catalogoEjemplo().first()
+
+            ResultadoDensidadParametroAScreen(
+                estructura = estructura,
+                parametroAPm = aPm,
+                parametroCPm = cPm,
+                masaMolar = masaMolar,
                 onBack = { navController.popBackStack() },
                 onIrALogin = { navController.navigate(route = Rutas.LOGIN) }
             )

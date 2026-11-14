@@ -184,8 +184,11 @@ fun IngresarDatosScreen(
                             estructura = estructura,
                             masaMolar = uiState.masaMolar,
                             onMasaMolarChange = viewModel::actualizarMasaMolar,
-                            volumenCelda = uiState.volumenCelda,
-                            onVolumenCeldaChange = viewModel::actualizarVolumenCelda
+                            volumenMantisa = uiState.volumenMantisa,
+                            onVolumenMantisaChange = viewModel::actualizarVolumenMantisa,
+                            volumenExponente = uiState.volumenExponente,
+                            onVolumenExponenteChange = viewModel::actualizarVolumenExponente,
+                            onAlternarSignoExponente = viewModel::alternarSignoExponente
                         )
 
                         ModoEntrada.PARAMETRO_A -> CampoParametroAContent(

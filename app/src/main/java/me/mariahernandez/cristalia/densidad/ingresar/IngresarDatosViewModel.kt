@@ -32,8 +32,9 @@ data class IngresarDatosUiState(
     val radioCation: String = "",
     val radioAnion: String = "",
 
-    // Tab Volumen
-    val volumenCelda: String = "",
+    // Tab Volumen: V = mantisa × 10^exponente (cm³). Ej.: 1.79 × 10^-22
+    val volumenMantisa: String = "",
+    val volumenExponente: String = "",
 
     // Tab Parámetro a
     val parametroA: String = "",
@@ -45,7 +46,19 @@ data class IngresarDatosUiState(
     // Resultado
     val densidadCalculada: Double? = null,
     val mensajeError: String? = null
-)
+) {
+
+    /**
+     * Volumen de la celda en cm³ = mantisa × 10^exponente.
+     * Devuelve null si falta la mantisa o el exponente, o si alguno no es un número válido.
+     */
+    val volumenCm3: Double?
+        get() {
+            val mantisa = volumenMantisa.toDoubleOrNull() ?: return null
+            val exponente = volumenExponente.toIntOrNull() ?: return null
+            return mantisa * Math.pow(10.0, exponente.toDouble())
+        }
+}
 
 class IngresarDatosViewModel(
     savedStateHandle: SavedStateHandle? = null,
@@ -82,7 +95,20 @@ class IngresarDatosViewModel(
     fun actualizarMasaMolar(valor: String) = _uiState.update { it.copy(masaMolar = valor) }
     fun actualizarRadioCation(valor: String) = _uiState.update { it.copy(radioCation = valor) }
     fun actualizarRadioAnion(valor: String) = _uiState.update { it.copy(radioAnion = valor) }
-    fun actualizarVolumenCelda(valor: String) = _uiState.update { it.copy(volumenCelda = valor) }
+    fun actualizarVolumenMantisa(valor: String) = _uiState.update { it.copy(volumenMantisa = valor) }
+
+    /** Solo acepta un "-" opcional al inicio y hasta 3 dígitos (ej. -22). */
+    fun actualizarVolumenExponente(valor: String) {
+        if (Regex("^-?\\d{0,3}$").matches(valor)) {
+            _uiState.update { it.copy(volumenExponente = valor) }
+        }
+    }
+
+    /** Botón ± : cambia el signo del exponente (-22 <-> 22). */
+    fun alternarSignoExponente() = _uiState.update {
+        val e = it.volumenExponente
+        it.copy(volumenExponente = if (e.startsWith("-")) e.removePrefix("-") else "-$e")
+    }
     fun actualizarParametroA(valor: String) = _uiState.update { it.copy(parametroA = valor) }
     fun actualizarParametroC(valor: String) = _uiState.update { it.copy(parametroC = valor) }
 
@@ -113,7 +139,7 @@ class IngresarDatosViewModel(
 
         val volumenCm3: Double? = when (estado.modoEntrada) {
             ModoEntrada.RADIO -> calcularVolumenDesdeRadios(estructura, estado)
-            ModoEntrada.VOLUMEN -> estado.volumenCelda.toDoubleOrNull()
+            ModoEntrada.VOLUMEN -> estado.volumenCm3
             ModoEntrada.PARAMETRO_A -> calcularVolumenDesdeParametroA(estructura, estado)
         }
 

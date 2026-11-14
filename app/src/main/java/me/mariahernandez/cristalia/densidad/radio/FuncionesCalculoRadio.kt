@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.cristalia.model.EstructuraCristalina
 import com.cristalia.model.RelacionRadioParametro
+import com.cristalia.model.SistemaCristalino
 import me.mariahernandez.cristalia.celdaunitaria.Paleta
 
 /** Una fila de la tabla de conteo de iones (Vértices, Caras, Aristas, Centro, Huecos...). */
@@ -61,7 +62,11 @@ data class DatosCalculoRadio(
     val paso1Lineas: List<String>,
     val conteoFilas: List<FilaConteo> = emptyList(),
     val totalAniones: Int = 0,
-    val totalCationes: Int = 0
+    val totalCationes: Int = 0,
+    // Solo modo "Parámetro a" (aPm ya existe arriba)
+    val aCmStr: String = "",
+    val cPm: Double = 0.0,
+    val cCmStr: String = ""
 )
 
 object FuncionesCalculoRadio {
@@ -205,6 +210,28 @@ object FuncionesCalculoRadio {
             conteoFilas = conteoFilas,
             totalAniones = totalAniones,
             totalCationes = totalCationes
+        )
+    }
+
+    /**
+     * Modo PARÁMETRO A: el usuario da a (y c si la celda no es cúbica), en pm.
+     * El volumen sale de estructura.calcularVolumenCelda y el resto se arma con
+     * calcularDesdeVolumen; luego solo se añaden los datos de a y c para mostrarlos.
+     *
+     * Ojo: si estructura.requiereParametroC es true, cPm no puede ser null.
+     */
+    fun calcularDesdeParametroA(
+        estructura: EstructuraCristalina,
+        masaMolar: Double,
+        aPm: Double,
+        cPm: Double? = null
+    ): DatosCalculoRadio {
+        val volumenCm3 = estructura.calcularVolumenCelda(aPm, cPm)
+        return calcularDesdeVolumen(estructura, masaMolar, volumenCm3).copy(
+            aPm = aPm,
+            aCmStr = formatoCientifico(aPm * 1e-10),
+            cPm = cPm ?: 0.0,
+            cCmStr = if (cPm != null) formatoCientifico(cPm * 1e-10) else ""
         )
     }
 
@@ -372,6 +399,17 @@ private fun FilaRadio(
     resultadoCm: String,
     colorResultado: Color
 ) {
+    FilaConversion(buildAnnotatedString { radio(letra, carga) }, valorPm, resultadoCm, colorResultado)
+}
+
+/** Fila "símbolo = valor pm × (1 cm / 10¹⁰ pm) = resultado cm". Sirve para radios, a y c. */
+@Composable
+private fun FilaConversion(
+    simbolo: AnnotatedString,
+    valorPm: Double,
+    resultadoCm: String,
+    colorResultado: Color
+) {
     Caja(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -380,7 +418,7 @@ private fun FilaRadio(
         ) {
             Text(
                 text = buildAnnotatedString {
-                    radio(letra, carga)
+                    append(simbolo)
                     append(" = ${numeroLimpio(valorPm)} ")
                     withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough, color = TextoApagado)) {
                         append("pm")
@@ -689,6 +727,88 @@ fun ContenidoDensidad(datos: DatosCalculoRadio) {
                 textAlign = TextAlign.End,
                 modifier = Modifier.weight(1f)
             )
+        }
+    }
+}
+
+// =====================================================================================
+//  UI DEL PASO 3 (VOLUMEN DE LA CELDA) — MODO "PARÁMETRO a"
+// =====================================================================================
+//  Se elige por el SISTEMA CRISTALINO (no por cada estructura), así que sirve para las 8:
+//    CÚBICO     -> V = a³                 (NaCl, Blenda, CsCl, Fluorita, Antifluorita)
+//    HEXAGONAL  -> V = (√3/2) · a² · c    (Wurtzita, CdI₂)
+//    TETRAGONAL -> V = a² · c             (Rutilo)
+//  Es distinto al paso 3 del modo Radio (ese depende de la relación radio–parámetro).
+// =====================================================================================
+
+/** Paso 3 para el modo Parámetro a. Usa datos.aPm / datos.cPm (en pm). */
+@Composable
+fun ContenidoVolumenParametroA(datos: DatosCalculoRadio) {
+    val sistema = datos.estructura.sistema
+    val conC = sistema != SistemaCristalino.CUBICO
+
+    val formulaBase = when (sistema) {
+        SistemaCristalino.CUBICO -> "V = a³"
+        SistemaCristalino.HEXAGONAL -> "V = (√3/2) · a² · c"
+        SistemaCristalino.TETRAGONAL -> "V = a² · c"
+    }
+    val calculo = when (sistema) {
+        SistemaCristalino.CUBICO -> "V = [ ${datos.aCmStr} ]³"
+        SistemaCristalino.HEXAGONAL -> "V = (√3/2) × [ ${datos.aCmStr} ]² × [ ${datos.cCmStr} ]"
+        SistemaCristalino.TETRAGONAL -> "V = [ ${datos.aCmStr} ]² × [ ${datos.cCmStr} ]"
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        // 1) FÓRMULAS BASE
+        SubTarjeta("FÓRMULAS BASE") {
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    formulaBase, color = Color.White, fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
+                )
+            }
+        }
+
+        // 2) CONVERSIÓN pm -> cm
+        SubTarjeta("CONVERSIÓN") {
+            FilaConversion(AnnotatedString("a"), datos.aPm, datos.aCmStr, ColorCation)
+            if (conC) {
+                FilaConversion(AnnotatedString("c"), datos.cPm, datos.cCmStr, ColorAnion)
+            }
+        }
+
+        // 3) CÁLCULO DEL VOLUMEN
+        SubTarjeta("CÁLCULO DEL VOLUMEN", bordeColor = Paleta.Cian.copy(alpha = 0.3f)) {
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = calculo,
+                    color = Color(0xFFD5DAE5),
+                    fontSize = 12.sp,
+                    fontFamily = FontFamily.Monospace,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Paleta.Cian.copy(alpha = 0.10f))
+                    .border(1.dp, Paleta.Cian.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text("Volumen total:", color = Color.White, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                Text(
+                    text = "V = ${datos.volumenCm3Str} cm³",
+                    color = Paleta.Cian, fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
