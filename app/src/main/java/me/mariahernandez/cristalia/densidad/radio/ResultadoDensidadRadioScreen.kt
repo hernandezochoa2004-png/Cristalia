@@ -192,50 +192,7 @@ fun ResultadoDensidadRadioScreen(
                     onAlternar = { viewModel.alternarPaso(4) },
                     destacado = true
                 ) {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Color.Black.copy(alpha = 0.35f)).border(1.dp, BordeApagado, RoundedCornerShape(8.dp)).padding(12.dp)
-                        ) {
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                Text("ρ = m / V_celda", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-                                Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).background(BotonFondo).padding(horizontal = 6.dp, vertical = 2.dp)) {
-                                    Text("[ g / cm³ ]", color = Paleta.Cian, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-                                }
-                            }
-                        }
-
-                        Box(
-                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Color.Black.copy(alpha = 0.35f)).border(1.dp, BordeApagado, RoundedCornerShape(8.dp)).padding(10.dp)
-                        ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text("Masa molar: %.2f g/mol".format(datos.masaMolar), color = Color.White, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                                Text("z = ${datos.estructura.z} UF", color = Color.White, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                                Text("Avogadro = 6.02214 × 10²³ mol⁻¹", color = Color.White, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                                Text("V_celda = %s cm³".format(datos.volumenCm3Str), color = Color.White, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                            }
-                        }
-
-                        Text("METIÉNDOLA EN LA FÓRMULA:", color = Paleta.TextoSecundario, fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-                        Box(
-                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(Color.Black.copy(alpha = 0.35f)).border(1.dp, BordeApagado, RoundedCornerShape(8.dp)).padding(12.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text("${datos.estructura.z} UF × (%.2f g / mol) × (1 mol / 6.02214×10²³ UF)".format(datos.masaMolar), color = Paleta.Cian, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                                Box(Modifier.fillMaxWidth(0.9f).height(1.dp).background(Paleta.Cian))
-                                Text("%s cm³".format(datos.volumenCm3Str), color = Color.White, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                            }
-                        }
-
-                        Box(
-                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(Paleta.Cian.copy(alpha = 0.12f)).border(1.5.dp, Paleta.Cian, RoundedCornerShape(10.dp)).padding(14.dp)
-                        ) {
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                Text("Resultado:", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-                                Text("ρ = %s g/cm³".format(datos.densidadGcm3Str), color = Paleta.Cian, fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-                            }
-                        }
-                    }
+                    ContenidoDensidad(datos)
                 }
 
             }

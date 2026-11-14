@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.cristalia.model.EstructuraCristalina
 import com.cristalia.model.RelacionRadioParametro
@@ -110,9 +111,9 @@ object FuncionesCalculoRadio {
 
         val p1Lineas = when (estructura.id) {
             "nacl" -> listOf(
-                "Aniones (B⁻): 8 vértices × 1/8 + 6 caras × 1/2 = 4 aniones B⁻",
-                "Cationes (A⁺): 12 aristas × 1/4 + 1 centro = 4 cationes A⁺",
-                "Total: 4 aniones B⁻ y 4 cationes A⁺ por celda unitaria"
+                "Aniones (Cl⁻) en red FCC: 8 esquinas × 1/8 + 6 caras × 1/2 = 4 aniones Cl⁻",
+                "Cationes (Na⁺) en huecos octaédricos: 12 aristas × 1/4 + 1 centro = 4 cationes Na⁺",
+                "Total: 4 aniones Cl⁻ y 4 cationes Na⁺ por celda unitaria"
             )
             "blenda" -> listOf(
                 "Aniones (S²⁻) en red FCC: 8 esquinas × 1/8 + 6 caras × 1/2 = 4 aniones S²⁻",
@@ -242,23 +243,29 @@ private fun numeroLimpio(v: Double): String =
 // ---------- Contenedores ----------
 
 @Composable
-private fun SubTarjeta(titulo: String, content: @Composable () -> Unit) {
+private fun SubTarjeta(
+    titulo: String? = null,
+    bordeColor: Color = BordeSubTarjeta,
+    content: @Composable () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
             .background(FondoSubTarjeta)
-            .border(1.dp, BordeSubTarjeta, RoundedCornerShape(14.dp))
+            .border(1.dp, bordeColor, RoundedCornerShape(14.dp))
             .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Text(
-            text = titulo,
-            color = Paleta.TextoSecundario,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace
-        )
+        if (titulo != null) {
+            Text(
+                text = titulo,
+                color = Paleta.TextoSecundario,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace
+            )
+        }
         content()
     }
 }
@@ -449,6 +456,187 @@ fun ContenidoVolumenCelda(datos: DatosCalculoRadio) {
                     modifier = Modifier.weight(1f)
                 )
             }
+        }
+    }
+}
+
+// =====================================================================================
+//  UI DEL PASO 4 (DENSIDAD TEÓRICA) — VÁLIDO PARA TODAS LAS ESTRUCTURAS
+// =====================================================================================
+//  A diferencia del paso 3, este NO depende de la estructura: usa ρ = Z·M / (Nₐ·V) con
+//  los valores que ya vienen calculados en DatosCalculoRadio (z, masa molar, volumen).
+//  Se puede reutilizar tal cual para las 8 estructuras.
+// =====================================================================================
+
+private val ColorVolumen = Color(0xFFFF8A8A)
+private val TextoClaro = Color(0xFFD5DAE5)
+
+/** Fracción apilada genérica: numerador / línea / denominador. */
+@Composable
+private fun Fraccion(
+    numerador: AnnotatedString,
+    denominador: AnnotatedString,
+    color: Color = TextoClaro,
+    fontSize: TextUnit = 11.sp
+) {
+    Column(
+        modifier = Modifier.width(IntrinsicSize.Max),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(numerador, color = color, fontSize = fontSize, fontFamily = FontFamily.Monospace)
+        Box(Modifier.fillMaxWidth().height(1.dp).background(TextoApagado))
+        Text(denominador, color = color, fontSize = fontSize, fontFamily = FontFamily.Monospace)
+    }
+}
+
+/** "V" con subíndice "celda". */
+private fun AnnotatedString.Builder.vCelda() {
+    append("V")
+    withStyle(SpanStyle(baselineShift = BaselineShift.Subscript, fontSize = 0.75.em)) { append("celda") }
+}
+
+@Composable
+private fun FilaDato(
+    etiqueta: AnnotatedString,
+    valor: String,
+    colorValor: Color = Color.White
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(etiqueta, color = TextoApagado, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+        Text(
+            text = valor,
+            color = colorValor,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Monospace,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun SeparadorFino() {
+    Box(Modifier.fillMaxWidth().height(1.dp).background(BordeSubTarjeta.copy(alpha = 0.7f)))
+}
+
+/** Paso 4: densidad teórica. Sirve para cualquier estructura. */
+@Composable
+fun ContenidoDensidad(datos: DatosCalculoRadio) {
+    val masaTexto = "%.2f".format(java.util.Locale.US, datos.masaMolar)
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        // 1) ρ = m / V_celda   [ g / cm³ ]
+        SubTarjeta(bordeColor = Paleta.Cian.copy(alpha = 0.3f)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("ρ", color = Paleta.Cian, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                    Text("=", color = TextoClaro, fontSize = 14.sp, fontFamily = FontFamily.Monospace)
+                    Fraccion(
+                        numerador = AnnotatedString("m"),
+                        denominador = buildAnnotatedString { vCelda() },
+                        fontSize = 13.sp
+                    )
+                }
+                Caja {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text("[", color = TextoApagado, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                        Fraccion(AnnotatedString("g"), AnnotatedString("cm³"), color = TextoApagado, fontSize = 11.sp)
+                        Text("]", color = TextoApagado, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                    }
+                }
+            }
+        }
+
+        // 2) Datos
+        SubTarjeta {
+            FilaDato(AnnotatedString("Masa molar:"), "$masaTexto g/mol")
+            SeparadorFino()
+            FilaDato(AnnotatedString("z ="), "${datos.estructura.z} UF", Paleta.Cian)
+            SeparadorFino()
+            FilaDato(AnnotatedString("Avogadro ="), "6.022 × 10²³ mol⁻¹")
+            SeparadorFino()
+            FilaDato(
+                etiqueta = buildAnnotatedString { vCelda(); append(" =") },
+                valor = "${datos.volumenCm3Str} cm³",
+                colorValor = ColorVolumen
+            )
+        }
+
+        // 3) Metiéndola en la fórmula
+        SubTarjeta("METIÉNDOLA EN LA FORMULA:") {
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("ρ =", color = Paleta.Cian, fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text("${datos.estructura.z} UF ×", color = TextoClaro, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                            Fraccion(AnnotatedString("$masaTexto g"), AnnotatedString("mol"), fontSize = 10.sp)
+                            Text("×", color = TextoApagado, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                            Fraccion(AnnotatedString("1 mol"), AnnotatedString("6.022 × 10²³ UF"), fontSize = 10.sp)
+                        }
+                        Box(Modifier.fillMaxWidth().height(1.dp).background(TextoApagado))
+                        Text(
+                            text = "${datos.volumenCm3Str} cm³",
+                            color = ColorVolumen,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace
+                        )
+                    }
+                }
+            }
+        }
+
+        // 4) Resultado
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(Paleta.Cian.copy(alpha = 0.10f))
+                .border(1.dp, Paleta.Cian.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text("Resultado:", color = Color.White, fontSize = 13.sp, fontFamily = FontFamily.Monospace)
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(SpanStyle(color = Paleta.Cian, fontSize = 18.sp, fontWeight = FontWeight.Bold)) { append("ρ") }
+                    withStyle(SpanStyle(color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)) { append(" = ") }
+                    withStyle(SpanStyle(color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)) { append(datos.densidadGcm3Str) }
+                    withStyle(SpanStyle(color = Paleta.Cian, fontSize = 12.sp)) { append(" g/cm³") }
+                },
+                fontFamily = FontFamily.Monospace,
+                textAlign = TextAlign.End,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
