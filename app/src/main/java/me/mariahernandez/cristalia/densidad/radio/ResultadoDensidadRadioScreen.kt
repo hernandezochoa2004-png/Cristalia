@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,6 +61,7 @@ import me.mariahernandez.cristalia.R
 import me.mariahernandez.cristalia.celdaunitaria.Paleta
 import me.mariahernandez.cristalia.celdaunitaria.Visor3D
 
+
 private val Fondo = Color(0xFF0A0E17)
 private val Tarjeta = Color(0xFF141A2B)
 private val BordeApagado = Color(0xFF1E2A3D)
@@ -68,22 +70,21 @@ private val TextoApagado = Color(0xFF9AA4B8)
 private val LineaGrilla = Color(0xFF111826)
 private val Rosa = Color(0xFFF2708A)
 
+// ─────────────────────────────────────────────────────────────
+//  PIEZAS COMPARTIDAS (las usan la pantalla de Radio y la de Volumen)
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Esqueleto común de las pantallas de resultado: fondo con grilla, barra superior,
+ * título "Densidad · Paso a paso", tarjeta con el modelo 3D y, debajo, los pasos.
+ */
 @Composable
-fun ResultadoDensidadRadioScreen(
+internal fun EsqueletoResultadoDensidad(
     estructura: EstructuraCristalina,
-    masaMolar: Double,
-    radioCation: Double,
-    radioAnion: Double,
-    onBack: () -> Unit = {},
-    onIrALogin: () -> Unit = {},
-    viewModel: ResultadoDensidadRadioViewModel = viewModel()
+    onBack: () -> Unit,
+    onIrALogin: () -> Unit,
+    pasos: @Composable ColumnScope.() -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
-    LaunchedEffect(estructura.id, masaMolar, radioCation, radioAnion) {
-        viewModel.inicializar(estructura, masaMolar, radioCation, radioAnion)
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -122,86 +123,121 @@ fun ResultadoDensidadRadioScreen(
         ) {
             TituloSeccionResultado()
             TarjetaEstructuraEncabezado(estructura = estructura)
+            pasos()
+        }
+    }
+}
 
-            uiState.datos?.let { datos ->
+/** Contenido del paso 1: tabla de conteo de iones (o el texto antiguo si no hay tabla). */
+@Composable
+internal fun Paso1ConteoIones(estructura: EstructuraCristalina, datos: DatosCalculoRadio) {
+    if (datos.conteoFilas.isNotEmpty()) {
+        ConteoIonesContent(estructura = estructura, datos = datos)
+    } else {
+        LineasConteoTexto(datos.paso1Lineas)
+    }
+}
 
-                PasoCard(
-                    pasoNumero = 1,
-                    titulo = "Número de iones y cationes",
-                    expandido = 1 in uiState.pasosExpandidos,
-                    onAlternar = { viewModel.alternarPaso(1) }
-                ) {
-                    if (datos.conteoFilas.isNotEmpty()) {
-                        ConteoIonesContent(estructura = estructura, datos = datos)
-                    } else {
-                        LineasConteoTexto(datos.paso1Lineas)
-                    }
-                }
+/** Contenido del paso 2: unidad fórmula y Z. */
+@Composable
+internal fun Paso2UnidadFormula(datos: DatosCalculoRadio) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color.Black.copy(alpha = 0.35f))
+            .border(1.dp, BordeApagado, RoundedCornerShape(10.dp))
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = datos.formulaAnionCationStr,
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace
+            )
+            Text(
+                text = datos.zStr,
+                color = Paleta.Cian,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace
+            )
+        }
+    }
+}
 
-                PasoCard(
-                    pasoNumero = 2,
-                    titulo = "Unidad fórmula",
-                    expandido = 2 in uiState.pasosExpandidos,
-                    onAlternar = { viewModel.alternarPaso(2) },
-                    colorAcento = TextoApagado
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color.Black.copy(alpha = 0.35f))
-                            .border(1.dp, BordeApagado, RoundedCornerShape(10.dp))
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = datos.formulaAnionCationStr,
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace
-                            )
-                            Text(
-                                text = datos.zStr,
-                                color = Paleta.Cian,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace
-                            )
-                        }
-                    }
-                }
+// ─────────────────────────────────────────────────────────────
+//  PANTALLA DE RESULTADO — MODO RADIO
+// ─────────────────────────────────────────────────────────────
 
-                PasoCard(
-                    pasoNumero = 3,
-                    titulo = "Volumen celda unitaria",
-                    expandido = 3 in uiState.pasosExpandidos,
-                    onAlternar = { viewModel.alternarPaso(3) }
-                ) {
-                    ContenidoVolumenCelda(datos)
-                }
+@Composable
+fun ResultadoDensidadRadioScreen(
+    estructura: EstructuraCristalina,
+    masaMolar: Double,
+    radioCation: Double,
+    radioAnion: Double,
+    onBack: () -> Unit = {},
+    onIrALogin: () -> Unit = {},
+    viewModel: ResultadoDensidadRadioViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
-                PasoCard(
-                    pasoNumero = 4,
-                    titulo = "Densidad teórica (ρ)",
-                    expandido = 4 in uiState.pasosExpandidos,
-                    onAlternar = { viewModel.alternarPaso(4) },
-                    destacado = true
-                ) {
-                    ContenidoDensidad(datos)
-                }
+    LaunchedEffect(estructura.id, masaMolar, radioCation, radioAnion) {
+        viewModel.inicializar(estructura, masaMolar, radioCation, radioAnion)
+    }
 
+    EsqueletoResultadoDensidad(estructura, onBack, onIrALogin) {
+        uiState.datos?.let { datos ->
+
+            PasoCard(
+                pasoNumero = 1,
+                titulo = "Número de iones y cationes",
+                expandido = 1 in uiState.pasosExpandidos,
+                onAlternar = { viewModel.alternarPaso(1) }
+            ) {
+                Paso1ConteoIones(estructura, datos)
+            }
+
+            PasoCard(
+                pasoNumero = 2,
+                titulo = "Unidad fórmula",
+                expandido = 2 in uiState.pasosExpandidos,
+                onAlternar = { viewModel.alternarPaso(2) },
+                colorAcento = TextoApagado
+            ) {
+                Paso2UnidadFormula(datos)
+            }
+
+            PasoCard(
+                pasoNumero = 3,
+                titulo = "Volumen celda unitaria",
+                expandido = 3 in uiState.pasosExpandidos,
+                onAlternar = { viewModel.alternarPaso(3) }
+            ) {
+                ContenidoVolumenCelda(datos)
+            }
+
+            PasoCard(
+                pasoNumero = 4,
+                titulo = "Densidad teórica (ρ)",
+                expandido = 4 in uiState.pasosExpandidos,
+                onAlternar = { viewModel.alternarPaso(4) },
+                destacado = true
+            ) {
+                ContenidoDensidad(datos)
             }
         }
     }
 }
 
 @Composable
-private fun BarraSuperior(onVolver: () -> Unit, onIrALogin: () -> Unit) {
+internal fun BarraSuperior(onVolver: () -> Unit, onIrALogin: () -> Unit) {
     val context = LocalContext.current
     // painterResource lanza excepción (y cierra la app) si el drawable no es
     // vector ni raster (p. ej. adaptive-icon / layer-list). Esto lo carga de forma segura.
@@ -297,7 +333,7 @@ private fun PildoraBarra(
 }
 
 @Composable
-private fun TituloSeccionResultado() {
+internal fun TituloSeccionResultado() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -347,7 +383,7 @@ private fun infoRed(id: String): InfoRed? = when (id) {
 }
 
 @Composable
-private fun TarjetaEstructuraEncabezado(estructura: EstructuraCristalina) {
+internal fun TarjetaEstructuraEncabezado(estructura: EstructuraCristalina) {
     val glbPath = estructura.modeloGlbAssetPath ?: "${estructura.id}.glb"
     val context = LocalContext.current
     val existeGlb = remember(glbPath) {
@@ -449,7 +485,7 @@ private fun TarjetaEstructuraEncabezado(estructura: EstructuraCristalina) {
 }
 
 @Composable
-private fun PasoCard(
+internal fun PasoCard(
     pasoNumero: Int,
     titulo: String,
     expandido: Boolean,
@@ -539,7 +575,7 @@ private fun glbConteoIones(id: String): String? = when (id) {
 }
 
 @Composable
-private fun ConteoIonesContent(estructura: EstructuraCristalina, datos: DatosCalculoRadio) {
+internal fun ConteoIonesContent(estructura: EstructuraCristalina, datos: DatosCalculoRadio) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         ImagenConteoIones(estructura.id)
 
@@ -684,7 +720,7 @@ private fun ItemResumenIon(color: Color, texto: String, valor: Int) {
 
 /** Diseño anterior (texto), se usa solo si la estructura no tiene tabla de conteo. */
 @Composable
-private fun LineasConteoTexto(lineas: List<String>) {
+internal fun LineasConteoTexto(lineas: List<String>) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         lineas.forEach { linea ->
             Box(

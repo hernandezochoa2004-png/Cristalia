@@ -87,19 +87,17 @@ object FuncionesCalculoRadio {
         return "$texto × 10${superindice(exp)}"
     }
 
-    fun calcularTodo(
-        estructura: EstructuraCristalina,
-        masaMolar: Double,
-        radioCatPm: Double,
-        radioAnPm: Double
-    ): DatosCalculoRadio {
-        val aPm = estructura.calcularParametroA(radioCatPm, radioAnPm) ?: (2.0 * (radioCatPm + radioAnPm))
-        val volumenCm3 = estructura.calcularVolumenCelda(aPm)
-        val densidad = (estructura.z * masaMolar) / (NUMERO_AVOGADRO * volumenCm3)
+    /** Textos y conteo de iones del paso 1 y 2. Lo comparten el modo Radio y el modo Volumen. */
+    private data class InfoEstructura(
+        val formulaAnionCation: String,
+        val zText: String,
+        val p1Lineas: List<String>,
+        val conteoFilas: List<FilaConteo>,
+        val totalAniones: Int,
+        val totalCationes: Int
+    )
 
-        val radioCatCm = radioCatPm * 1e-10
-        val radioAnCm = radioAnPm * 1e-10
-
+    private fun infoEstructura(estructura: EstructuraCristalina): InfoEstructura {
         val (formulaAnionCation, zText) = when (estructura.id) {
             "nacl" -> Pair("A₄B₄  ➔  4 AB", "z = 4 UF")
             "blenda" -> Pair("Zn₄S₄  ➔  4 ZnS", "z = 4 UF")
@@ -172,6 +170,60 @@ object FuncionesCalculoRadio {
         val totalAniones = conteoFilas.filter { it.esAnion }.sumOf { it.aporte }
         val totalCationes = conteoFilas.filter { !it.esAnion }.sumOf { it.aporte }
 
+        return InfoEstructura(formulaAnionCation, zText, p1Lineas, conteoFilas, totalAniones, totalCationes)
+    }
+
+    /**
+     * Modo VOLUMEN: el usuario ya da el volumen de la celda (en cm³), así que no hay radios
+     * ni parámetro "a". Reutiliza DatosCalculoRadio para poder usar las mismas UI de los pasos
+     * 1, 2 y de densidad; los campos de radio / aPm quedan en 0 y no se muestran.
+     */
+    fun calcularDesdeVolumen(
+        estructura: EstructuraCristalina,
+        masaMolar: Double,
+        volumenCm3: Double
+    ): DatosCalculoRadio {
+        val densidad = (estructura.z * masaMolar) / (NUMERO_AVOGADRO * volumenCm3)
+        val (formulaAnionCation, zText, p1Lineas, conteoFilas, totalAniones, totalCationes) =
+            infoEstructura(estructura)
+
+        return DatosCalculoRadio(
+            estructura = estructura,
+            masaMolar = masaMolar,
+            radioCatPm = 0.0,
+            radioAnPm = 0.0,
+            aPm = 0.0,
+            radioCatCmStr = "",
+            radioAnCmStr = "",
+            volumenCm3 = volumenCm3,
+            volumenCm3Str = formatoCientifico(volumenCm3),
+            densidadGcm3 = densidad,
+            densidadGcm3Str = "%.2f".format(java.util.Locale.US, densidad),
+            formulaAnionCationStr = formulaAnionCation,
+            zStr = zText,
+            paso1Lineas = p1Lineas,
+            conteoFilas = conteoFilas,
+            totalAniones = totalAniones,
+            totalCationes = totalCationes
+        )
+    }
+
+    fun calcularTodo(
+        estructura: EstructuraCristalina,
+        masaMolar: Double,
+        radioCatPm: Double,
+        radioAnPm: Double
+    ): DatosCalculoRadio {
+        val aPm = estructura.calcularParametroA(radioCatPm, radioAnPm) ?: (2.0 * (radioCatPm + radioAnPm))
+        val volumenCm3 = estructura.calcularVolumenCelda(aPm)
+        val densidad = (estructura.z * masaMolar) / (NUMERO_AVOGADRO * volumenCm3)
+
+        val radioCatCm = radioCatPm * 1e-10
+        val radioAnCm = radioAnPm * 1e-10
+
+        val (formulaAnionCation, zText, p1Lineas, conteoFilas, totalAniones, totalCationes) =
+            infoEstructura(estructura)
+
         val catFormat = formatoCientifico(radioCatCm)
         val anFormat = formatoCientifico(radioAnCm)
         val volFormat = formatoCientifico(volumenCm3)
@@ -187,7 +239,7 @@ object FuncionesCalculoRadio {
             volumenCm3 = volumenCm3,
             volumenCm3Str = volFormat,
             densidadGcm3 = densidad,
-            densidadGcm3Str = "%.2f".format(densidad),
+            densidadGcm3Str = "%.2f".format(java.util.Locale.US, densidad),
             formulaAnionCationStr = formulaAnionCation,
             zStr = zText,
             paso1Lineas = p1Lineas,

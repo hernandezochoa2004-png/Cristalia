@@ -15,6 +15,9 @@ import me.mariahernandez.cristalia.densidad.DensidadScreen
 import me.mariahernandez.cristalia.densidad.radio.ResultadoDensidadRadioScreen
 import me.mariahernandez.cristalia.huecos.HuecosScreen
 
+import com.cristalia.ui.ingresardatos.ModoEntrada
+import me.mariahernandez.cristalia.densidad.volumen.ResultadoDensidadVolumenScreen
+
 object Rutas {
 
     const val INICIO = "inicio"             //
@@ -33,6 +36,8 @@ object Rutas {
     const val INGRESAR_DATOS = "ingresar_datos/{opcionId}" // Pantalla ingresar datos densidad
 
     const val RESULTADO_DENSIDAD_RADIO = "resultado_densidad_radio/{opcionId}/{masaMolar}/{radioCation}/{radioAnion}"
+
+    const val RESULTADO_DENSIDAD_VOLUMEN = "resultado_densidad_volumen/{opcionId}/{masaMolar}/{volumenCelda}"
 }
 
 @Composable
@@ -124,10 +129,28 @@ fun AppNavigation() {
                 onBack = { navController.popBackStack() },
                 onIrALogin = { navController.navigate(route = Rutas.LOGIN) },
                 onNavegarAResultado = { _ ->
-                    val masaMolar = viewModel.uiState.value.masaMolar
-                    val rCat = viewModel.uiState.value.radioCation
-                    val rAn = viewModel.uiState.value.radioAnion
-                    navController.navigate("resultado_densidad_radio/$opcionId/$masaMolar/$rCat/$rAn")
+                    val estado = viewModel.uiState.value
+                    val masaMolar = estado.masaMolar
+
+                    // Cada tab abre su propia pantalla de resultado
+                    when (estado.modoEntrada) {
+                        ModoEntrada.RADIO -> {
+                            val rCat = estado.radioCation
+                            val rAn = estado.radioAnion
+                            navController.navigate("resultado_densidad_radio/$opcionId/$masaMolar/$rCat/$rAn")
+                        }
+
+                        ModoEntrada.VOLUMEN -> {
+                            val volumen = estado.volumenCelda.toDoubleOrNull()
+                            if (volumen != null) {
+                                navController.navigate("resultado_densidad_volumen/$opcionId/$masaMolar/$volumen")
+                            }
+                        }
+
+                        ModoEntrada.PARAMETRO_A -> {
+                            // TODO: pantalla de resultado para el tab "Parámetro a"
+                        }
+                    }
                 },
                 viewModel = viewModel
             )
@@ -148,6 +171,24 @@ fun AppNavigation() {
                 masaMolar = masaMolar,
                 radioCation = rCat,
                 radioAnion = rAn,
+                onBack = { navController.popBackStack() },
+                onIrALogin = { navController.navigate(route = Rutas.LOGIN) }
+            )
+        }
+
+        composable(route = Rutas.RESULTADO_DENSIDAD_VOLUMEN) { backStackEntry ->
+            val opcionId = backStackEntry.arguments?.getString("opcionId") ?: "nacl"
+            val masaMolar = backStackEntry.arguments?.getString("masaMolar")?.toDoubleOrNull() ?: 0.0
+            val volumenCm3 = backStackEntry.arguments?.getString("volumenCelda")?.toDoubleOrNull() ?: 0.0
+
+            val estructura = EstructuraCristalina.catalogoEjemplo()
+                .firstOrNull { it.id == opcionId }
+                ?: EstructuraCristalina.catalogoEjemplo().first()
+
+            ResultadoDensidadVolumenScreen(
+                estructura = estructura,
+                masaMolar = masaMolar,
+                volumenCm3 = volumenCm3,
                 onBack = { navController.popBackStack() },
                 onIrALogin = { navController.navigate(route = Rutas.LOGIN) }
             )
