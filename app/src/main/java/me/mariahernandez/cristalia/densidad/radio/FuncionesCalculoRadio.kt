@@ -36,6 +36,15 @@ import com.cristalia.model.RelacionRadioParametro
 import com.cristalia.model.SistemaCristalino
 import me.mariahernandez.cristalia.celdaunitaria.Paleta
 
+
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import me.mariahernandez.cristalia.R
+
 /** Una fila de la tabla de conteo de iones (Vértices, Caras, Aristas, Centro, Huecos...). */
 data class FilaConteo(
     val posicion: String,   // "Vértices", "Caras", "Aristas", "Centro", "Huecos tetraédricos"
@@ -105,7 +114,7 @@ object FuncionesCalculoRadio {
     private fun infoEstructura(estructura: EstructuraCristalina): InfoEstructura {
         val (formulaAnionCation, zText) = when (estructura.id) {
             "nacl" -> Pair("A₄B₄  ➔  4 AB", "z = 4 UF")
-            "blenda" -> Pair("Zn₄S₄  ➔  4 ZnS", "z = 4 UF")
+            "blenda" -> Pair("Zn₄S₄  ➔  4 AB", "z = 4 AB")
             "cscl" -> Pair("Cs₁Cl₁  ➔  1 CsCl", "z = 1 UF")
             "fluorita" -> Pair("Ca₄F₈  ➔  4 CaF₂", "z = 4 UF")
             "antifluorita" -> Pair("Li₈O₄  ➔  4 Li₂O", "z = 4 UF")
@@ -154,7 +163,7 @@ object FuncionesCalculoRadio {
             "blenda" -> listOf(
                 FilaConteo("Vértices", 8, "⅛", 1, true),
                 FilaConteo("Caras", 6, "½", 3, true),
-                FilaConteo("½ huecos tetraédricos", 4, "1", 4, false)
+                FilaConteo("Centro", 4, "1", 4, false)
             )
             "cscl" -> listOf(
                 FilaConteo("Vértices", 8, "⅛", 1, true),
@@ -538,6 +547,172 @@ fun ContenidoVolumenCelda(datos: DatosCalculoRadio) {
                     "Volumen total:", color = Color.White, fontSize = 12.sp,
                     fontFamily = FontFamily.Monospace
                 )
+                Text(
+                    text = "V = ${datos.volumenCm3Str} cm³",
+                    color = Paleta.Cian, fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+// ---------- Contenido del paso 3 para BLENDA ----------
+
+/** Cuadro para tu imagen. Pasa R.drawable.xxx; con null muestra el hueco vacío. */
+@Composable
+private fun EspacioImagenVolumen(modifier: Modifier = Modifier, @DrawableRes imagen: Int? = null) {
+    Box(
+        modifier = modifier
+            .aspectRatio(1.2f)
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color.Black)
+            .border(1.dp, BordeSubTarjeta, RoundedCornerShape(10.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        if (imagen != null) {
+            Image(
+                painter = painterResource(imagen),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            Text(
+                "Aquí va tu imagen", color = TextoApagado, fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace, textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+/** Texto "(rA⁺ + rB⁻)" reutilizable. */
+private fun AnnotatedString.Builder.sumaRadios() {
+    append("("); radio("A", "⁺"); append(" + "); radio("B", "⁻"); append(")")
+}
+
+
+//**----------------BLENDA               */
+/** Paso 3 para BLENDA (FCC_DIAGONAL): x = 4/√3 · (rA⁺ + rB⁻),  V = x³. */
+@Composable
+fun ContenidoVolumenBlenda(datos: DatosCalculoRadio) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        // 1) FÓRMULA BASE + IMÁGENES
+        SubTarjeta("FÓRMULA BASE") {
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    "V = x³", color = Color.White, fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                EspacioImagenVolumen(Modifier.weight(1f), imagen = R.drawable.imgblenda2) // R.drawable.tu_imagen_1
+                EspacioImagenVolumen(Modifier.weight(1f), imagen = R.drawable.imgblenda1) // R.drawable.tu_imagen_2
+            }
+        }
+
+        // 2) DESARROLLO
+        SubTarjeta("DESARROLLO") {
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    "( ? )² = ( x/4 )² + ( x/4 )²",
+                    color = TextoClaro, fontSize = 12.sp, fontFamily = FontFamily.Monospace
+                )
+            }
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = buildAnnotatedString {
+                        sumaRadios(); append("² = ( x/4 )² + ( ? )²")
+                    },
+                    color = TextoClaro, fontSize = 12.sp, fontFamily = FontFamily.Monospace
+                )
+            }
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = buildAnnotatedString { sumaRadios(); append("² = 3x² / 16") },
+                    color = TextoClaro, fontSize = 12.sp, fontFamily = FontFamily.Monospace
+                )
+            }
+
+            Text(
+                "Aplicando raíz cuadrada y despejando:",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = buildAnnotatedString {
+                        radio("A", "⁺"); append(" + "); radio("B", "⁻"); append(" = (√3 / 4) · x")
+                    },
+                    color = TextoClaro, fontSize = 12.sp, fontFamily = FontFamily.Monospace
+                )
+            }
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("x = ", color = Color.White, fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                    Fraccion(AnnotatedString("4"), AnnotatedString("√3"), color = Color.White, fontSize = 12.sp)
+                    Text(
+                        text = buildAnnotatedString { append(" · "); sumaRadios() },
+                        color = Color.White, fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
+                    )
+                }
+            }
+        }
+
+        // 3) V_celda = x³  →  fórmula final
+        SubTarjeta(bordeColor = Paleta.Cian.copy(alpha = 0.3f)) {
+            Text(
+                "Y como Vcelda = x³, entonces:",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+            Caja(bordeColor = Paleta.Cian.copy(alpha = 0.3f), modifier = Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("V = [ ", color = Paleta.Cian, fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                    Fraccion(AnnotatedString("4"), AnnotatedString("√3"), color = Paleta.Cian, fontSize = 13.sp)
+                    Text(
+                        text = buildAnnotatedString { append(" · "); sumaRadios(); append(" ]³") },
+                        color = Paleta.Cian, fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
+                    )
+                }
+            }
+        }
+
+        // 4) RADIOS IÓNICOS Y CONVERSIÓN
+        SubTarjeta("RADIOS IÓNICOS Y CONVERSIÓN") {
+            FilaRadio("A", "⁺", datos.radioCatPm, datos.radioCatCmStr, ColorCation)
+            FilaRadio("B", "⁻", datos.radioAnPm, datos.radioAnCmStr, ColorAnion)
+        }
+
+        // 5) CÁLCULO DEL VOLUMEN
+        SubTarjeta("CÁLCULO DEL VOLUMEN") {
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("V = [ ", color = TextoClaro, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                    Fraccion(AnnotatedString("4"), AnnotatedString("√3"), fontSize = 11.sp)
+                    Text(
+                        text = " (${datos.radioCatCmStr} + ${datos.radioAnCmStr}) ]³",
+                        color = TextoClaro, fontSize = 12.sp, fontFamily = FontFamily.Monospace
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Paleta.Cian.copy(alpha = 0.10f))
+                    .border(1.dp, Paleta.Cian.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text("Volumen total:", color = Color.White, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
                 Text(
                     text = "V = ${datos.volumenCm3Str} cm³",
                     color = Paleta.Cian, fontSize = 14.sp,

@@ -220,7 +220,12 @@ fun ResultadoDensidadRadioScreen(
                 expandido = 3 in uiState.pasosExpandidos,
                 onAlternar = { viewModel.alternarPaso(3) }
             ) {
-                ContenidoVolumenCelda(datos)
+
+                // IMPORTANTE -> Ya que la mayoría utiliza los mismos items, pero cambia el volumen de celda unitaria y aquí permite clasificar
+                when (datos.estructura.id) {
+                    "blenda" -> ContenidoVolumenBlenda(datos)
+                    else -> ContenidoVolumenCelda(datos)
+                }
             }
 
             PasoCard(
@@ -382,12 +387,29 @@ private fun infoRed(id: String): InfoRed? = when (id) {
     else -> null
 }
 
+/**
+ * AQUÍ PONES EL MODELO GLB DEL ENCABEZADO (la tarjeta de arriba de esta pantalla),
+ * uno por cada estructura cristalina.
+ * 1) Copia el .glb a app/src/main/assets/ (puede ir en una subcarpeta, ej. models/densidad/).
+ * 2) Escribe su ruta aquí, relativa a assets, sin barra al inicio.
+ * Mientras valga null se muestra el recuadro vacío con "Aquí va tu modelo 3D".
+ */
+private fun glbEncabezado(id: String): String? = when (id) {
+    "nacl" -> "models/densidad/naclvolume_centrado.glb"          // "models/densidad/nacl_header.glb"
+    "blenda" -> "models/densidad/blendavolume_centrado.glb"        // "models/densidad/blenda_header.glb"
+    "cscl" -> null          // "models/densidad/cscl_header.glb"
+    "fluorita" -> null      // "models/densidad/fluorita_header.glb"
+    "antifluorita" -> null  // "models/densidad/antifluorita_header.glb"
+    else -> null
+}
+
 @Composable
 internal fun TarjetaEstructuraEncabezado(estructura: EstructuraCristalina) {
-    val glbPath = estructura.modeloGlbAssetPath ?: "${estructura.id}.glb"
     val context = LocalContext.current
-    val existeGlb = remember(glbPath) {
-        try { context.assets.open(glbPath).close(); true } catch (e: Exception) { false }
+    val rutaGlb = glbEncabezado(estructura.id)
+    // Solo muestra el visor si el archivo existe en assets (evita cerrar la app si falta)
+    val existeGlb = remember(rutaGlb) {
+        rutaGlb != null && try { context.assets.open(rutaGlb).close(); true } catch (e: Exception) { false }
     }
     val info = infoRed(estructura.id)
 
@@ -410,11 +432,12 @@ internal fun TarjetaEstructuraEncabezado(estructura: EstructuraCristalina) {
                     .border(1.dp, Paleta.Cian.copy(alpha = 0.25f), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                if (existeGlb) {
-                    Visor3D(rutaGlb = glbPath, modifier = Modifier.fillMaxSize())
+                if (existeGlb && rutaGlb != null) {
+                    Visor3D(rutaGlb = rutaGlb, modifier = Modifier.fillMaxSize())
                 } else {
+                    // Hueco libre mientras no pongas el .glb de esta estructura
                     Text(
-                        text = "Modelo 3D (.glb)\napp/src/main/assets/$glbPath",
+                        text = "Aquí va tu modelo 3D",
                         color = Paleta.TextoSecundario,
                         fontSize = 12.sp,
                         fontFamily = FontFamily.Monospace,
@@ -567,7 +590,7 @@ internal fun PasoCard(
  */
 private fun glbConteoIones(id: String): String? = when (id) {
     "nacl" -> "models/densidad/naclatoms_centrado.glb"
-    "blenda" -> null          // "models/densidad/blenda_atoms.glb"
+    "blenda" -> "models/densidad/blendeatoms_centrado.glb"          // "models/densidad/blenda_atoms.glb"
     "cscl" -> null            // "models/densidad/cscl_atoms.glb"
     "fluorita" -> null        // "models/densidad/fluorita_atoms.glb"
     "antifluorita" -> null    // "models/densidad/antifluorita_atoms.glb"

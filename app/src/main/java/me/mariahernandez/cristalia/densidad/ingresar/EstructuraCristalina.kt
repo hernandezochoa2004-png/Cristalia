@@ -56,7 +56,8 @@ data class EstructuraCristalina(
     val requiereParametroC: Boolean = false,
     val formulaRelacionTexto: String,
     val compuestosRelacionados: List<CompuestoEjemplo> = emptyList(),
-    val modeloGlbAssetPath: String? = null // ruta de tu modelo .glb; null = aún sin asignar
+    val modeloGlbAssetPath: String? = null, // modelo .glb de la pantalla "Ingresar datos"; null = aún sin asignar
+    val modeloGlbResultadoAssetPath: String? = null // modelo .glb de la pantalla de RESULTADO (radio); null = usa modeloGlbAssetPath
 ) {
 
     /**
@@ -111,6 +112,8 @@ data class EstructuraCristalina(
                 z = 4,
                 formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 2(r+ + r-)",
                 modeloGlbAssetPath = "models/densidad/nacl_centrado.glb",
+                // modeloGlbResultadoAssetPath = "models/densidad/nacl_resultado.glb", // <- descomenta y pon tu GLB
+                modeloGlbResultadoAssetPath = "models/densidad/naclvolume_centrado.glb",    // Revisar
                 compuestosRelacionados = listOf(
                     CompuestoEjemplo("LiF, LiCl, LiBr, LiI", "Haluros alcalinos e hidruros"),
                     CompuestoEjemplo("NaCl, NaBr, NaI", "Haluros alcalinos e hidruros"),
@@ -129,7 +132,9 @@ data class EstructuraCristalina(
                 relacionRadioParametro = RelacionRadioParametro.FCC_DIAGONAL,
                 z = 4,
                 formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3",
-                modeloGlbAssetPath = "blenda.glb"
+                modeloGlbAssetPath = "models/densidad/blenda_centrado.glb",
+                // modeloGlbResultadoAssetPath = "models/densidad/blenda_resultado.glb" // <- descomenta y pon tu GLB
+                modeloGlbResultadoAssetPath = "models/densidad/blendavolume_centrado.glb",      // REVISAR
             ),
             EstructuraCristalina(
                 id = "wurtzita",
