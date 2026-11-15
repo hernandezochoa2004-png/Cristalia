@@ -121,6 +121,8 @@ object FuncionesCalculoRadio {
             "cscl" -> Pair("A₂B₂  ➔  2 AB", "z = 2 UF")
             "fluorita" -> Pair("A₄B₈  ➔  4 AB₂", "z = 4 UF")
             "antifluorita" -> Pair("A₈B₄  ➔  4 A₂B", "z = 4 UF")
+            "yodurocadmio" -> Pair("A₃B₆ ➔ 3 AB₂", "z = 3 UF")
+            "rutilo" -> Pair("A₂B₄ ➔ 2 AB₂", "z = 2 UF")
             else -> Pair("${estructura.nombre}  ➔  ${estructura.z} UF", "z = ${estructura.z} UF")
         }
 
@@ -191,6 +193,20 @@ object FuncionesCalculoRadio {
             "antifluorita" -> listOf(
                 FilaConteo("Vértices (8 cubos)", 8, "⅛ * 8", 8, false),
                 FilaConteo("Interior (4 cubos)", 1, "1 * 4", 4, true)
+            )
+            "yodurocadmio" -> listOf(
+                FilaConteo("Vértices", 12, "⅙", 2, true),
+                FilaConteo("Caras", 2, "½", 1, true),
+                FilaConteo("Interior", 3, "1", 3, true),
+                FilaConteo("Interior", 3, "1", 3, false)
+
+            )
+            "rutilo" -> listOf(
+                FilaConteo("Vértices", 8, "⅛", 1, false),
+                FilaConteo("Interior", 1, "1", 1, false),
+                FilaConteo("Caras", 4, "½", 2, true),
+                FilaConteo("Interior", 2, "1", 2, true)
+
             )
             else -> emptyList()
         }

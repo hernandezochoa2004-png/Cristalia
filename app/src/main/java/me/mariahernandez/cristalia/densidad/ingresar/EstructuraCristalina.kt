@@ -218,16 +218,29 @@ data class EstructuraCristalina(
                 )
             ),
             EstructuraCristalina(
-                id = "yoduro_cadmio",
+                id = "yodurocadmio",
                 nombre = "Yoduro de cadmio",
                 formulaQuimica = "CdI2 / Capas coordinadas",
                 grupoRelacion = "AB2",
                 sistema = SistemaCristalino.HEXAGONAL,
                 relacionRadioParametro = RelacionRadioParametro.NINGUNA,
-                z = 1,
+                z = 3,
                 requiereParametroC = true,
+                prismaHexagonal = true,       // <- NUEVO: V = (3√3/2)·a²·c, igual que Wurtzita
                 formulaRelacionTexto = "Estructura hexagonal en capas: ingresa a y c directamente",
-                modeloGlbAssetPath = "yodurocadmio.glb"
+                modeloGlbAssetPath = "models/densidad/yodurocadmio_centrado.glb",
+
+                compuestosRelacionados = listOf(
+                    CompuestoEjemplo("MBr₂ (M = Mg, Fe, Co, Ni, Cd)", "Bromuros metálicos"),
+                    CompuestoEjemplo("MCl₂ (M = Ti, V)", "Cloruros metálicos"),
+                    CompuestoEjemplo("MI₂ (M = Mg, Ca, Ti, Mn, Fe, Co, Ni, Zn, Cd, Pb)", "Yoduros metálicos"),
+                    CompuestoEjemplo("M(OH)₂ (M = Mg, Ca, Mn, Fe, Co, Ni, Cd)", "Hidróxidos metálicos"),
+                    CompuestoEjemplo("MS₂ (M = Ti, Zr, Pt, Sn)", "Sulfuros metálicos"),
+                    CompuestoEjemplo("MSe₂ (M = Ti, V)", "Seleniuros metálicos"),
+                    CompuestoEjemplo("MTe₂ (M = Ti, V, Co, Ni)", "Telururos metálicos")
+                )
+
+
             ),
             EstructuraCristalina(
                 id = "rutilo",
@@ -239,7 +252,13 @@ data class EstructuraCristalina(
                 z = 2,
                 requiereParametroC = true,
                 formulaRelacionTexto = "Estructura tetragonal: ingresa a y c directamente",
-                modeloGlbAssetPath = "rutilo.glb"
+                modeloGlbAssetPath = "models/densidad/rutilo_centrado.glb",
+
+                compuestosRelacionados = listOf(
+                    CompuestoEjemplo("MF₂ (M = Mg, Cr, Mn, Fe, Co, Ni, Cu, Zn)", "Fluoruros metálicos"),
+                    CompuestoEjemplo("MO₂ (M = Si, Ge, Sn, Pb, Te, Ti, V, Cr, Mn, Zr, Mo, Os, Ir, Ce)", "Dióxidos metálicos")
+                )
+
             )
         )
     }

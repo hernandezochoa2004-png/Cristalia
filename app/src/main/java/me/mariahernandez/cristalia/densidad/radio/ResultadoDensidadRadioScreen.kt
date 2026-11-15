@@ -403,6 +403,8 @@ private fun glbEncabezado(id: String): String? = when (id) {
     "cscl" -> "models/densidad/csclvolumen_centrado_celda.glb"         // "models/densidad/cscl_header.glb"
     "fluorita" -> "models/densidad/fluoritavolume_centrado_celda.glb"    // "models/densidad/fluorita_header.glb"
     "antifluorita" -> "models/densidad/antifluoritavolume_centrado_celda.glb"  // "models/densidad/antifluorita_header.glb"
+    "yodurocadmio" -> "models/densidad/yodurocadmiovolume_centrado_celda.glb"
+    "rutilo" -> "models/densidad/rutilovolume_centrado_celda.glb"
     else -> null
 }
 
@@ -598,6 +600,8 @@ private fun glbConteoIones(id: String): String? = when (id) {
     "cscl" -> "models/densidad/csclatoms_centrado.glb"            // "models/densidad/cscl_atoms.glb"
     "fluorita" -> "models/densidad/fluoritatoms_centrado.glb"        // "models/densidad/fluorita_atoms.glb"
     "antifluorita" -> "models/densidad/antifluoritaatoms_centrado.glb"    // "models/densidad/antifluorita_atoms.glb"
+    "yodurocadmio" -> "models/densidad/yodurocadmioatoms_centrado.glb"
+    "rutilo" -> "models/densidad/rutiloatoms_centrado.glb"
     else -> null
 }
 

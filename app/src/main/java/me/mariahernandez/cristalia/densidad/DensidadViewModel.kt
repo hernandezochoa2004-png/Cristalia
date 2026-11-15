@@ -38,7 +38,7 @@ data class DensidadUiState(
             opciones = listOf(
                 OpcionDensidad("fluorita", "Fluorita", "CaF₂ / Estructura fluorita", "fluorita"),
                 OpcionDensidad("antifluorita", "Antifluorita", "Óxido de litio / Antifluorita", "antifluorita"),
-                OpcionDensidad("cdi2", "Yoduro de cadmio", "CdI₂ / Capas coordinadas", "yodurocadmio"),
+                OpcionDensidad("yodurocadmio", "Yoduro de cadmio", "CdI₂ / Capas coordinadas", "yodurocadmio"),
                 OpcionDensidad("rutilo", "Rutilo", "TiO₂ / Dióxido de titanio", "rutilo")
             )
         )

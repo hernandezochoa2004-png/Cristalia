@@ -71,7 +71,7 @@ fun ResultadoDensidadParametroAScreen(
                 onAlternar = { viewModel.alternarPaso(3) }
             ) {
                 when (datos.estructura.id) {
-                    "wurtzita" -> ContenidoVolumenWurtzita(datos)
+                    "wurtzita","yodurocadmio" -> ContenidoVolumenWurtzita(datos)
                     else -> ContenidoVolumenParametroA(datos)
                 }
             }
