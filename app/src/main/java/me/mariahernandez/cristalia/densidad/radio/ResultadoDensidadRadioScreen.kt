@@ -396,7 +396,8 @@ private fun infoRed(id: String): InfoRed? = when (id) {
  */
 private fun glbEncabezado(id: String): String? = when (id) {
     "nacl" -> "models/densidad/naclvolume_centrado.glb"          // "models/densidad/nacl_header.glb"
-    "blenda" -> "models/densidad/blendavolume_centrado.glb"        // "models/densidad/blenda_header.glb"
+    "blenda" -> "models/densidad/blendavolume_centrado_v2.glb"        // "models/densidad/blenda_header.glb"
+    "wurtzita" -> "models/densidad/wurtzitavolume_centrado.glb"
     "cscl" -> null          // "models/densidad/cscl_header.glb"
     "fluorita" -> null      // "models/densidad/fluorita_header.glb"
     "antifluorita" -> null  // "models/densidad/antifluorita_header.glb"
@@ -591,6 +592,7 @@ internal fun PasoCard(
 private fun glbConteoIones(id: String): String? = when (id) {
     "nacl" -> "models/densidad/naclatoms_centrado.glb"
     "blenda" -> "models/densidad/blendeatoms_centrado.glb"          // "models/densidad/blenda_atoms.glb"
+    "wurtzita" -> "models/densidad/wurtzitatoms_centrado.glb"
     "cscl" -> null            // "models/densidad/cscl_atoms.glb"
     "fluorita" -> null        // "models/densidad/fluorita_atoms.glb"
     "antifluorita" -> null    // "models/densidad/antifluorita_atoms.glb"

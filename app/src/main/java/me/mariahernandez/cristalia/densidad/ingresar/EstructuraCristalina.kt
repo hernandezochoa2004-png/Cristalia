@@ -54,10 +54,10 @@ data class EstructuraCristalina(
     val z: Int,
     val requiereDosRadios: Boolean = true,
     val requiereParametroC: Boolean = false,
+    val prismaHexagonal: Boolean = false,   // true = celda = prisma hexagonal completo: V = (3√3/2)·a²·c
     val formulaRelacionTexto: String,
     val compuestosRelacionados: List<CompuestoEjemplo> = emptyList(),
     val modeloGlbAssetPath: String? = null, // modelo .glb de la pantalla "Ingresar datos"; null = aún sin asignar
-    val modeloGlbResultadoAssetPath: String? = null // modelo .glb de la pantalla de RESULTADO (radio); null = usa modeloGlbAssetPath
 ) {
 
     /**
@@ -86,7 +86,8 @@ data class EstructuraCristalina(
             SistemaCristalino.CUBICO -> aCm.pow3()
             SistemaCristalino.HEXAGONAL -> {
                 requireNotNull(cCm) { "Esta estructura hexagonal requiere el parámetro c" }
-                (Math.sqrt(3.0) / 2.0) * aCm * aCm * cCm
+                val factor = if (prismaHexagonal) 3.0 * Math.sqrt(3.0) / 2.0 else Math.sqrt(3.0) / 2.0
+                factor * aCm * aCm * cCm                                                                                //(Math.sqrt(3.0) / 2.0) * aCm * aCm * cCm
             }
             SistemaCristalino.TETRAGONAL -> {
                 requireNotNull(cCm) { "Esta estructura tetragonal requiere el parámetro c" }
@@ -112,8 +113,7 @@ data class EstructuraCristalina(
                 z = 4,
                 formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 2(r+ + r-)",
                 modeloGlbAssetPath = "models/densidad/nacl_centrado.glb",
-                // modeloGlbResultadoAssetPath = "models/densidad/nacl_resultado.glb", // <- descomenta y pon tu GLB
-                modeloGlbResultadoAssetPath = "models/densidad/naclvolume_centrado.glb",    // Revisar
+
                 compuestosRelacionados = listOf(
                     CompuestoEjemplo("LiF, LiCl, LiBr, LiI", "Haluros alcalinos e hidruros"),
                     CompuestoEjemplo("NaCl, NaBr, NaI", "Haluros alcalinos e hidruros"),
@@ -133,8 +133,15 @@ data class EstructuraCristalina(
                 z = 4,
                 formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3",
                 modeloGlbAssetPath = "models/densidad/blenda_centrado.glb",
-                // modeloGlbResultadoAssetPath = "models/densidad/blenda_resultado.glb" // <- descomenta y pon tu GLB
-                modeloGlbResultadoAssetPath = "models/densidad/blendavolume_centrado.glb",      // REVISAR
+
+                compuestosRelacionados = listOf(
+                    CompuestoEjemplo("BeX, ZnX, CdX, HgX (X = S, Se, Te)", "Calcogenuros de Be, Zn, Cd y Hg"),
+                    CompuestoEjemplo("Diamante, silicio, germanio, estaño gris", "Elementos del grupo 14 (tipo diamante)"),
+                    CompuestoEjemplo("SiO₂ (cristobalita)", "Sílice"),
+                    CompuestoEjemplo("BN, BP, SiC, CuX (X = F, Cl, Br, I)", "Binarios con B, Si y haluros de cobre"),
+                    CompuestoEjemplo("XY (X = Al, Ga, In; Y = P, As, Sb)", "Compuestos III-V")
+                )
+
             ),
             EstructuraCristalina(
                 id = "wurtzita",
@@ -143,10 +150,21 @@ data class EstructuraCristalina(
                 grupoRelacion = "AB",
                 sistema = SistemaCristalino.HEXAGONAL,
                 relacionRadioParametro = RelacionRadioParametro.NINGUNA,
-                z = 2,
+                z = 6,
+
                 requiereParametroC = true,
+                prismaHexagonal = true,
+
                 formulaRelacionTexto = "Estructura hexagonal: ingresa a y c directamente (sin fórmula r+/r- aún)",
-                modeloGlbAssetPath = "wurtzita.glb"
+                modeloGlbAssetPath = "models/densidad/wurtzita_centrado.glb",
+
+                compuestosRelacionados = listOf(
+                        CompuestoEjemplo("ZnX (X = O, S, Te)", "Compuestos de zinc"),
+                    CompuestoEjemplo("CdX (X = S, Se)", "Compuestos de cadmio"),
+                    CompuestoEjemplo("BeO, MgTe, NH₄F", "Otros compuestos AB"),
+                    CompuestoEjemplo("MN (M = Al, Ga, In)", "Nitruros III-V"),
+                    CompuestoEjemplo("AgI, NH₄F", "Otros compuestos AB")
+            )
             ),
             EstructuraCristalina(
                 id = "cscl",

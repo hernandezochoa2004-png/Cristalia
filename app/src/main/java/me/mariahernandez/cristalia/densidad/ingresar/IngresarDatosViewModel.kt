@@ -15,6 +15,8 @@ import me.mariahernandez.cristalia.SessionRepositoryFalso
 import me.mariahernandez.cristalia.celdaunitaria.EventoUi
 import com.cristalia.model.EstructuraCristalina
 
+import com.cristalia.model.RelacionRadioParametro
+
 /** Los 3 tabs del mockup: Radio, Volumen, Parámetro a. */
 enum class ModoEntrada { RADIO, VOLUMEN, PARAMETRO_A }
 
@@ -75,7 +77,13 @@ class IngresarDatosViewModel(
     fun cargarEstructura(estructura: EstructuraCristalina) {
         if (_uiState.value.estructura?.id != estructura.id) {
             _uiState.update {
-                IngresarDatosUiState(estructura = estructura)
+                IngresarDatosUiState(
+                    estructura = estructura,
+                    modoEntrada = if (estructura.relacionRadioParametro == RelacionRadioParametro.NINGUNA)
+                        ModoEntrada.VOLUMEN
+                    else
+                        ModoEntrada.RADIO
+                )
             }
         }
     }

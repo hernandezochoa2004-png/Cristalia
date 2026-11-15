@@ -20,11 +20,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
@@ -43,9 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cristalia.model.EstructuraCristalina
+import com.cristalia.model.RelacionRadioParametro
 import me.mariahernandez.cristalia.R
 import me.mariahernandez.cristalia.celdaunitaria.EventoUi
 import me.mariahernandez.cristalia.celdaunitaria.Paleta
@@ -157,7 +154,9 @@ fun IngresarDatosScreen(
                 onDescargar = { viewModel.onDescargarClick(glbPath) }
             )
 
+            // (1) <-> HCP no maneja la opcion de radios, esto ayuda a clasificar
             SelectorModoEntrada(
+                estructura = estructura,
                 modoSeleccionado = uiState.modoEntrada,
                 onModoSeleccionado = viewModel::seleccionarModo
             )
@@ -405,16 +404,22 @@ private fun TarjetaVisorModelo(
     }
 }
 
+
+// HCP no maneja la opcion de radio sino 2. Entonces se necesita clasificar.
 @Composable
 private fun SelectorModoEntrada(
+    estructura: EstructuraCristalina,
     modoSeleccionado: ModoEntrada,
     onModoSeleccionado: (ModoEntrada) -> Unit
 ) {
-    val opciones = listOf(
-        ModoEntrada.RADIO to "Radio",
-        ModoEntrada.VOLUMEN to "Volumen",
-        ModoEntrada.PARAMETRO_A to "Parámetro a"
-    )
+    // Sin fórmula radio→a (relación NINGUNA) no se ofrece el tab "Radio"
+    val opciones = buildList {
+        if (estructura.relacionRadioParametro != RelacionRadioParametro.NINGUNA) {
+            add(ModoEntrada.RADIO to "Radio")
+        }
+        add(ModoEntrada.VOLUMEN to "Volumen")
+        add(ModoEntrada.PARAMETRO_A to "Parámetro a")
+    }
 
     Row(
         modifier = Modifier

@@ -45,6 +45,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import me.mariahernandez.cristalia.R
 
+import androidx.compose.foundation.layout.RowScope
+
 /** Una fila de la tabla de conteo de iones (Vértices, Caras, Aristas, Centro, Huecos...). */
 data class FilaConteo(
     val posicion: String,   // "Vértices", "Caras", "Aristas", "Centro", "Huecos tetraédricos"
@@ -114,7 +116,8 @@ object FuncionesCalculoRadio {
     private fun infoEstructura(estructura: EstructuraCristalina): InfoEstructura {
         val (formulaAnionCation, zText) = when (estructura.id) {
             "nacl" -> Pair("A₄B₄  ➔  4 AB", "z = 4 UF")
-            "blenda" -> Pair("Zn₄S₄  ➔  4 AB", "z = 4 AB")
+            "blenda" -> Pair("A₄B₄  ➔  4 AB", "z = 4 AB")
+            "wurtzita" -> Pair("A₆B₆  ➔  6 AB", "z = 6 UF")
             "cscl" -> Pair("Cs₁Cl₁  ➔  1 CsCl", "z = 1 UF")
             "fluorita" -> Pair("Ca₄F₈  ➔  4 CaF₂", "z = 4 UF")
             "antifluorita" -> Pair("Li₈O₄  ➔  4 Li₂O", "z = 4 UF")
@@ -131,6 +134,11 @@ object FuncionesCalculoRadio {
                 "Aniones (S²⁻) en red FCC: 8 esquinas × 1/8 + 6 caras × 1/2 = 4 aniones S²⁻",
                 "Cationes (Zn²⁺) en 1/2 huecos tetraédricos = 4 cationes Zn²⁺",
                 "Total: 4 aniones S²⁻ y 4 cationes Zn²⁺ por celda unitaria"
+            )
+            "wurtzita" -> listOf(
+                "Aniones (S²⁻) en red hexagonal: 8 vértices × 1/8 + 1 interior = 2 aniones S²⁻",
+                "Cationes (Zn²⁺) en 1/2 huecos tetraédricos: 4 aristas × 1/4 + 1 interior = 2 cationes Zn²⁺",
+                "Total: 2 aniones S²⁻ y 2 cationes Zn²⁺ por celda unitaria"
             )
             "cscl" -> listOf(
                 "Aniones (Cl⁻) en esquinas Cúbica Simple: 8 × 1/8 = 1 anión Cl⁻",
@@ -168,6 +176,13 @@ object FuncionesCalculoRadio {
             "cscl" -> listOf(
                 FilaConteo("Vértices", 8, "⅛", 1, true),
                 FilaConteo("Centro", 1, "1", 1, false)
+            )
+            "wurtzita" -> listOf(
+                FilaConteo("Vértices", 12, "⅙", 2, true),
+                FilaConteo("Interior", 3, "1", 3, true),
+                FilaConteo(posicion = "Caras", cantidad = 2, fraccion = "½", aporte = 1, esAnion=true),
+                FilaConteo("Aristas", 6, "⅓", 2, false),
+                FilaConteo("Interior", 4, "1", 4, false)
             )
             "fluorita" -> listOf(
                 FilaConteo("Vértices", 8, "⅛", 1, false),
@@ -559,7 +574,7 @@ fun ContenidoVolumenCelda(datos: DatosCalculoRadio) {
     }
 }
 
-// ---------- Contenido del paso 3 para BLENDA ----------
+// ======= Contenido del paso 3 para BLENDA =================00
 
 /** Cuadro para tu imagen. Pasa R.drawable.xxx; con null muestra el hueco vacío. */
 @Composable
@@ -578,11 +593,6 @@ private fun EspacioImagenVolumen(modifier: Modifier = Modifier, @DrawableRes ima
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            Text(
-                "Aquí va tu imagen", color = TextoApagado, fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace, textAlign = TextAlign.Center
             )
         }
     }
@@ -719,6 +729,154 @@ fun ContenidoVolumenBlenda(datos: DatosCalculoRadio) {
                     fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
                     textAlign = TextAlign.End,
                     modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+// ===================================================
+// ---------- Paso 3 para WURTZITA (prisma hexagonal): V = A_b · c ----------
+
+@Composable
+private fun TF(texto: String, color: Color = TextoClaro, size: TextUnit = 12.sp, negrita: Boolean = false) {
+    Text(
+        texto, color = color, fontSize = size,
+        fontWeight = if (negrita) FontWeight.Bold else FontWeight.Normal,
+        fontFamily = FontFamily.Monospace
+    )
+}
+
+private fun AnnotatedString.Builder.sub(t: String) =
+    withStyle(SpanStyle(baselineShift = BaselineShift.Subscript, fontSize = 0.75.em)) { append(t) }
+
+@Composable
+private fun TA(
+    color: Color = TextoClaro, size: TextUnit = 12.sp, negrita: Boolean = false,
+    build: AnnotatedString.Builder.() -> Unit
+) {
+    Text(
+        buildAnnotatedString(build), color = color, fontSize = size,
+        fontWeight = if (negrita) FontWeight.Bold else FontWeight.Normal,
+        fontFamily = FontFamily.Monospace
+    )
+}
+
+@Composable
+private fun FF(num: String, den: String, color: Color = TextoClaro, size: TextUnit = 11.sp) =
+    Fraccion(AnnotatedString(num), AnnotatedString(den), color, size)
+
+@Composable
+private fun LineaFormula(
+    bordeColor: Color = BordeSubTarjeta,
+    content: @Composable RowScope.() -> Unit
+) {
+    Caja(bordeColor = bordeColor, modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically, content = content)
+    }
+}
+
+@Composable
+private fun ImagenConLeyenda(leyenda: String, modifier: Modifier = Modifier, @DrawableRes imagen: Int? = null) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        EspacioImagenVolumen(Modifier.fillMaxWidth(), imagen)
+        Text(leyenda, color = TextoApagado, fontSize = 10.sp,
+            fontFamily = FontFamily.Monospace, textAlign = TextAlign.Center)
+    }
+}
+
+/** Paso 3 de WURTZITA (modo Parámetro a): V = A_b · c = (3√3/2) · a² · c. Usa datos.aPm / cPm. */
+@Composable
+fun ContenidoVolumenWurtzita(datos: DatosCalculoRadio) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        // 0) ENCABEZADO + IMÁGENES
+        SubTarjeta {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Caja { TA(Color.White, 12.sp, true) { append("V = A"); sub("b"); append(" · c") } }
+                TF("Geometría Hexagonal", Paleta.Cian, 11.sp, true)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ImagenConLeyenda("Triángulo equilátero (base)", Modifier.weight(1f), imagen = R.drawable.triangulo)          // R.drawable.xxx
+                ImagenConLeyenda("Empaquetamiento hexagonal (2r = a)", Modifier.weight(1f), imagen = R.drawable.abajo)   // R.drawable.xxx
+            }
+        }
+
+        // 1) ALTURA
+        SubTarjeta("1. Altura (h) del triángulo equilátero:") {
+            LineaFormula { TF("sen(60°) = "); FF("h", "a") }
+            LineaFormula { TF("h = a · sen(60°) = "); FF("a · √3", "2") }
+        }
+
+        // 2) ÁREA DEL TRIÁNGULO
+        SubTarjeta("2. Área del triángulo (A_t) base = a:") {
+            LineaFormula {
+                TA { append("A"); sub("t"); append(" = ") }
+                FF("base · h", "2"); TF(" = "); FF("a", "2"); TF(" · [ "); FF("a · √3", "2"); TF(" ]")
+            }
+            LineaFormula { TA { append("A"); sub("t"); append(" = ") }; FF("a² · √3", "4") }
+        }
+
+        // 3) ÁREA DE LA BASE HEXAGONAL
+        SubTarjeta("3. Área total base hexagonal (6 triángulos):") {
+            LineaFormula {
+                TA { append("A"); sub("b"); append(" = 6 · A"); sub("t"); append(" = 6 · [ ") }
+                FF("a² · √3", "4"); TF(" ]")
+            }
+            LineaFormula { TA { append("A"); sub("b"); append(" = ") }; FF("3 · √3", "2"); TF(" · a²") }
+        }
+
+        // 4) EXPRESIÓN FINAL
+        SubTarjeta(bordeColor = Paleta.Cian.copy(alpha = 0.3f)) {
+            TF("Expresión analítica del volumen de la celda:", TextoApagado, 11.sp)
+            LineaFormula(Paleta.Cian.copy(alpha = 0.3f)) {
+                TA(Paleta.Cian, 13.sp, true) {
+                    append("V"); sub("celda"); append(" = A"); sub("b"); append(" · c = ")
+                }
+                FF("3 · √3", "2", Paleta.Cian, 12.sp)
+                TF(" · a² · c", Paleta.Cian, 13.sp, true)
+            }
+        }
+
+        // 5) PARÁMETROS DE RED Y CONVERSIÓN
+        SubTarjeta("PARÁMETROS DE RED Y CONVERSIÓN") {
+            FilaConversion(AnnotatedString("a"), datos.aPm, datos.aCmStr, ColorCation)
+            FilaConversion(AnnotatedString("c"), datos.cPm, datos.cCmStr, ColorAnion)
+        }
+
+        // 6) CÁLCULO DEL VOLUMEN
+        SubTarjeta("CÁLCULO DEL VOLUMEN", bordeColor = Paleta.Cian.copy(alpha = 0.3f)) {
+            Caja(modifier = Modifier.fillMaxWidth()) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        TF("V = ", Color.White, 13.sp, true)
+                        FF("3 · √3", "2", Color.White, 12.sp)
+                        TF(" ×", Color.White, 13.sp, true)
+                    }
+                    TF("( ${datos.aCmStr} )² × ( ${datos.cCmStr} )", TextoClaro, 12.sp)
+                }
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Paleta.Cian.copy(alpha = 0.10f))
+                    .border(1.dp, Paleta.Cian.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                TF("Volumen total:", Color.White, 12.sp)
+                Text(
+                    text = "V = ${datos.volumenCm3Str} cm³",
+                    color = Paleta.Cian, fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
+                    textAlign = TextAlign.End, modifier = Modifier.weight(1f)
                 )
             }
         }

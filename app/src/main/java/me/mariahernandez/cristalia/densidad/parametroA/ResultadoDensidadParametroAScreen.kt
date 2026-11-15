@@ -14,6 +14,8 @@ import me.mariahernandez.cristalia.densidad.radio.Paso1ConteoIones
 import me.mariahernandez.cristalia.densidad.radio.Paso2UnidadFormula
 import me.mariahernandez.cristalia.densidad.radio.PasoCard
 
+import me.mariahernandez.cristalia.densidad.radio.ContenidoVolumenWurtzita
+
 private val AcentoApagado = Color(0xFF9AA4B8)
 
 /**
@@ -68,7 +70,10 @@ fun ResultadoDensidadParametroAScreen(
                 expandido = 3 in uiState.pasosExpandidos,
                 onAlternar = { viewModel.alternarPaso(3) }
             ) {
-                ContenidoVolumenParametroA(datos)
+                when (datos.estructura.id) {
+                    "wurtzita" -> ContenidoVolumenWurtzita(datos)
+                    else -> ContenidoVolumenParametroA(datos)
+                }
             }
 
             PasoCard(
