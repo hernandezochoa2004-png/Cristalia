@@ -173,9 +173,15 @@ data class EstructuraCristalina(
                 grupoRelacion = "AB",
                 sistema = SistemaCristalino.CUBICO,
                 relacionRadioParametro = RelacionRadioParametro.BCC_DIAGONAL,
-                z = 1,
+                z = 2,
                 formulaRelacionTexto = "Relación r+/r- para celda BCC: parámetro a = 2(r+ + r-)/√3",
-                modeloGlbAssetPath = "cscl.glb"
+                modeloGlbAssetPath = "models/densidad/cscl_centrado.glb",
+
+                compuestosRelacionados = listOf(
+                    CompuestoEjemplo("CsX (X = Cl, Br, I, SH, CN)", "Compuestos de cesio"),
+                    CompuestoEjemplo("TlX (X = Cl, Br, I, CN)", "Compuestos de talio"),
+                    CompuestoEjemplo("NH₄X (X = Cl, Br, CN)", "Compuestos de amonio")
+                )
             ),
             EstructuraCristalina(
                 id = "fluorita",

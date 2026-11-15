@@ -118,7 +118,7 @@ object FuncionesCalculoRadio {
             "nacl" -> Pair("A₄B₄  ➔  4 AB", "z = 4 UF")
             "blenda" -> Pair("A₄B₄  ➔  4 AB", "z = 4 AB")
             "wurtzita" -> Pair("A₆B₆  ➔  6 AB", "z = 6 UF")
-            "cscl" -> Pair("Cs₁Cl₁  ➔  1 CsCl", "z = 1 UF")
+            "cscl" -> Pair("A₂B₂  ➔  2 AB", "z = 2 UF")
             "fluorita" -> Pair("Ca₄F₈  ➔  4 CaF₂", "z = 4 UF")
             "antifluorita" -> Pair("Li₈O₄  ➔  4 Li₂O", "z = 4 UF")
             else -> Pair("${estructura.nombre}  ➔  ${estructura.z} UF", "z = ${estructura.z} UF")
@@ -877,6 +877,121 @@ fun ContenidoVolumenWurtzita(datos: DatosCalculoRadio) {
                     color = Paleta.Cian, fontSize = 14.sp,
                     fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
                     textAlign = TextAlign.End, modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+// ---------- Paso 3 para CsCl (BCC_DIAGONAL): a = (1/√3)·(2rA⁺ + 2rB⁻),  V = a³ ----------
+
+/** Texto "(2 rA⁺ + 2 rB⁻)" reutilizable. */
+private fun AnnotatedString.Builder.dobleSumaRadios() {
+    append("(2 "); radio("A", "⁺"); append(" + 2 "); radio("B", "⁻"); append(")")
+}
+
+/** Paso 3 para CsCl: el catión toca al anión por la diagonal del cubo, 2rA⁺ + 2rB⁻ = a·√3. */
+@Composable
+fun ContenidoVolumenCsCl(datos: DatosCalculoRadio) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        // 1) FÓRMULAS BASE
+        SubTarjeta("FÓRMULAS BASE") {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Caja(modifier = Modifier.weight(1f)) {
+                    Text(
+                        "V = a³", color = Color.White, fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
+                    )
+                }
+                Caja(modifier = Modifier.weight(1f)) {
+                    Text(
+                        "ℓ² = a² + a²", color = Paleta.Cian, fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace
+                    )
+                }
+            }
+            Text(
+                "ℓ = diagonal de una cara del cubo",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+        }
+
+        // 2) DESARROLLO
+        SubTarjeta("DESARROLLO") {
+            LineaFormula {
+                TA { dobleSumaRadios(); append("² = a² + ℓ²") }
+            }
+            LineaFormula {
+                TA { dobleSumaRadios(); append("² = a² + a² + a²") }
+            }
+            LineaFormula {
+                TA { dobleSumaRadios(); append("² = 3a²") }
+            }
+
+            Text(
+                "Aplicando raíz cuadrada:",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+            LineaFormula {
+                TA { append("2 "); radio("A", "⁺"); append(" + 2 "); radio("B", "⁻"); append(" = √3 · a") }
+            }
+
+            Text(
+                "Despejando para a:",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+            LineaFormula {
+                TF("a = ", Color.White, 13.sp, true)
+                FF("1", "√3", Color.White, 12.sp)
+                TA(Color.White, 13.sp, true) { append(" · "); dobleSumaRadios() }
+            }
+        }
+
+        // 3) V = a³  →  fórmula final
+        SubTarjeta(bordeColor = Paleta.Cian.copy(alpha = 0.3f)) {
+            Text(
+                "Y como V = a³, entonces:",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+            LineaFormula(bordeColor = Paleta.Cian.copy(alpha = 0.3f)) {
+                TF("V = [ ", Paleta.Cian, 16.sp, true)
+                FF("1", "√3", Paleta.Cian, 13.sp)
+                TA(Paleta.Cian, 16.sp, true) { append(" · "); dobleSumaRadios(); append(" ]³") }
+            }
+        }
+
+        // 4) RADIOS IÓNICOS Y CONVERSIÓN
+        SubTarjeta("RADIOS IÓNICOS Y CONVERSIÓN") {
+            FilaRadio("A", "⁺", datos.radioCatPm, datos.radioCatCmStr, ColorCation)
+            FilaRadio("B", "⁻", datos.radioAnPm, datos.radioAnCmStr, ColorAnion)
+        }
+
+        // 5) CÁLCULO DEL VOLUMEN
+        SubTarjeta("CÁLCULO DEL VOLUMEN") {
+            LineaFormula {
+                TF("V = [ ")
+                FF("1", "√3")
+                TF(" (2 · ${datos.radioCatCmStr} + 2 · ${datos.radioAnCmStr}) ]³")
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Paleta.Cian.copy(alpha = 0.10f))
+                    .border(1.dp, Paleta.Cian.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text("Volumen total:", color = Color.White, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                Text(
+                    text = "V = ${datos.volumenCm3Str} cm³",
+                    color = Paleta.Cian, fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

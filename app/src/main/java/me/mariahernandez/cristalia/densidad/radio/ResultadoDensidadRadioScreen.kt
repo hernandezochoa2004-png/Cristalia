@@ -224,6 +224,7 @@ fun ResultadoDensidadRadioScreen(
                 // IMPORTANTE -> Ya que la mayoría utiliza los mismos items, pero cambia el volumen de celda unitaria y aquí permite clasificar
                 when (datos.estructura.id) {
                     "blenda" -> ContenidoVolumenBlenda(datos)
+                    "cscl" -> ContenidoVolumenCsCl(datos)      // <- NUEVA
                     else -> ContenidoVolumenCelda(datos)
                 }
             }
@@ -398,7 +399,7 @@ private fun glbEncabezado(id: String): String? = when (id) {
     "nacl" -> "models/densidad/naclvolume_centrado.glb"          // "models/densidad/nacl_header.glb"
     "blenda" -> "models/densidad/blendavolume_centrado_v2.glb"        // "models/densidad/blenda_header.glb"
     "wurtzita" -> "models/densidad/wurtzitavolume_centrado.glb"
-    "cscl" -> null          // "models/densidad/cscl_header.glb"
+    "cscl" -> "models/densidad/csclvolumen_centrado_celda.glb"         // "models/densidad/cscl_header.glb"
     "fluorita" -> null      // "models/densidad/fluorita_header.glb"
     "antifluorita" -> null  // "models/densidad/antifluorita_header.glb"
     else -> null
@@ -593,7 +594,7 @@ private fun glbConteoIones(id: String): String? = when (id) {
     "nacl" -> "models/densidad/naclatoms_centrado.glb"
     "blenda" -> "models/densidad/blendeatoms_centrado.glb"          // "models/densidad/blenda_atoms.glb"
     "wurtzita" -> "models/densidad/wurtzitatoms_centrado.glb"
-    "cscl" -> null            // "models/densidad/cscl_atoms.glb"
+    "cscl" -> "models/densidad/csclatoms_centrado.glb"            // "models/densidad/cscl_atoms.glb"
     "fluorita" -> null        // "models/densidad/fluorita_atoms.glb"
     "antifluorita" -> null    // "models/densidad/antifluorita_atoms.glb"
     else -> null
