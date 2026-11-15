@@ -70,7 +70,7 @@ data class DatosCalculoRadio(
     val densidadGcm3Str: String,
     val formulaAnionCationStr: String,
     val zStr: String,
-    val paso1Lineas: List<String>,
+    // AQUI (2)
     val conteoFilas: List<FilaConteo> = emptyList(),
     val totalAniones: Int = 0,
     val totalCationes: Int = 0,
@@ -107,7 +107,7 @@ object FuncionesCalculoRadio {
     private data class InfoEstructura(
         val formulaAnionCation: String,
         val zText: String,
-        val p1Lineas: List<String>,
+        // AQUI 3
         val conteoFilas: List<FilaConteo>,
         val totalAniones: Int,
         val totalCationes: Int
@@ -118,49 +118,15 @@ object FuncionesCalculoRadio {
             "nacl" -> Pair("A₄B₄  ➔  4 AB", "z = 4 UF")
             "blenda" -> Pair("A₄B₄  ➔  4 AB", "z = 4 AB")
             "wurtzita" -> Pair("A₆B₆  ➔  6 AB", "z = 6 UF")
-            "cscl" -> Pair("A₂B₂  ➔  2 AB", "z = 2 UF")
-            "fluorita" -> Pair("A₄B₈  ➔  4 AB₂", "z = 4 UF")
+            "cscl" -> Pair("AB  ➔  AB", "z = 1 UF")
+            "fluorita" -> Pair("A₈B₄  ➔  4 A₂B", "z = 4 UF")
             "antifluorita" -> Pair("A₈B₄  ➔  4 A₂B", "z = 4 UF")
             "yodurocadmio" -> Pair("A₃B₆ ➔ 3 AB₂", "z = 3 UF")
             "rutilo" -> Pair("A₂B₄ ➔ 2 AB₂", "z = 2 UF")
             else -> Pair("${estructura.nombre}  ➔  ${estructura.z} UF", "z = ${estructura.z} UF")
         }
 
-        val p1Lineas = when (estructura.id) {
-            "nacl" -> listOf(
-                "Aniones (Cl⁻) en red FCC: 8 esquinas × 1/8 + 6 caras × 1/2 = 4 aniones Cl⁻",
-                "Cationes (Na⁺) en huecos octaédricos: 12 aristas × 1/4 + 1 centro = 4 cationes Na⁺",
-                "Total: 4 aniones Cl⁻ y 4 cationes Na⁺ por celda unitaria"
-            )
-            "blenda" -> listOf(
-                "Aniones (S²⁻) en red FCC: 8 esquinas × 1/8 + 6 caras × 1/2 = 4 aniones S²⁻",
-                "Cationes (Zn²⁺) en 1/2 huecos tetraédricos = 4 cationes Zn²⁺",
-                "Total: 4 aniones S²⁻ y 4 cationes Zn²⁺ por celda unitaria"
-            )
-            "wurtzita" -> listOf(
-                "Aniones (S²⁻) en red hexagonal: 8 vértices × 1/8 + 1 interior = 2 aniones S²⁻",
-                "Cationes (Zn²⁺) en 1/2 huecos tetraédricos: 4 aristas × 1/4 + 1 interior = 2 cationes Zn²⁺",
-                "Total: 2 aniones S²⁻ y 2 cationes Zn²⁺ por celda unitaria"
-            )
-            "cscl" -> listOf(
-                "Aniones (Cl⁻) en esquinas Cúbica Simple: 8 × 1/8 = 1 anión Cl⁻",
-                "Cationes (Cs⁺) en el centro de la celda = 1 catión Cs⁺",
-                "Total: 1 anión Cl⁻ y 1 catión Cs⁺ por celda unitaria"
-            )
-            "fluorita" -> listOf(
-                "Cationes (Ca²⁺) en red FCC: 8 esquinas × 1/8 + 6 caras × 1/2 = 4 cationes Ca²⁺",
-                "Aniones (F⁻) ocupan todos los 8 huecos tetraédricos = 8 aniones F⁻",
-                "Total: 4 cationes Ca²⁺ y 8 aniones F⁻ por celda unitaria"
-            )
-            "antifluorita" -> listOf(
-                "Aniones (O²⁻) en red FCC: 8 esquinas × 1/8 + 6 caras × 1/2 = 4 aniones O²⁻",
-                "Cationes (Li⁺) ocupan todos los 8 huecos tetraédricos = 8 cationes Li⁺",
-                "Total: 4 aniones O²⁻ y 8 cationes Li⁺ por celda unitaria"
-            )
-            else -> listOf(
-                "Conteo para ${estructura.nombre}: Z = ${estructura.z} unidades fórmula por celda"
-            )
-        }
+        // AQUI (4)
 
         // Tabla de conteo para el paso 1 (esAnion = true -> cian, false -> rosa)
         val conteoFilas = when (estructura.id) {
@@ -187,8 +153,9 @@ object FuncionesCalculoRadio {
                 FilaConteo("Interior", 4, "1", 4, false)
             )
             "fluorita" -> listOf(
-                FilaConteo("Vértices", 8, "⅛", 1, false),
-                FilaConteo("Interior", 4, "1", 4, true)
+                FilaConteo("Interior", 8, "1", 8, false),
+                FilaConteo("Vértices", 8, "⅛", 1, true),
+                FilaConteo("Caras", 6, "½", 3, true)
             )
             "antifluorita" -> listOf(
                 FilaConteo("Vértices (8 cubos)", 8, "⅛ * 8", 8, false),
@@ -213,7 +180,7 @@ object FuncionesCalculoRadio {
         val totalAniones = conteoFilas.filter { it.esAnion }.sumOf { it.aporte }
         val totalCationes = conteoFilas.filter { !it.esAnion }.sumOf { it.aporte }
 
-        return InfoEstructura(formulaAnionCation, zText, p1Lineas, conteoFilas, totalAniones, totalCationes)
+        return InfoEstructura(formulaAnionCation, zText, conteoFilas, totalAniones, totalCationes)   // AQUI (5)
     }
 
     /**
@@ -227,8 +194,8 @@ object FuncionesCalculoRadio {
         volumenCm3: Double
     ): DatosCalculoRadio {
         val densidad = (estructura.z * masaMolar) / (NUMERO_AVOGADRO * volumenCm3)
-        val (formulaAnionCation, zText, p1Lineas, conteoFilas, totalAniones, totalCationes) =
-            infoEstructura(estructura)
+        val (formulaAnionCation, zText, conteoFilas, totalAniones, totalCationes) =
+            infoEstructura(estructura)   // AQUI (7)
 
         return DatosCalculoRadio(
             estructura = estructura,
@@ -244,7 +211,7 @@ object FuncionesCalculoRadio {
             densidadGcm3Str = "%.2f".format(java.util.Locale.US, densidad),
             formulaAnionCationStr = formulaAnionCation,
             zStr = zText,
-            paso1Lineas = p1Lineas,
+            // AQUI 8
             conteoFilas = conteoFilas,
             totalAniones = totalAniones,
             totalCationes = totalCationes
@@ -286,8 +253,8 @@ object FuncionesCalculoRadio {
         val radioCatCm = radioCatPm * 1e-10
         val radioAnCm = radioAnPm * 1e-10
 
-        val (formulaAnionCation, zText, p1Lineas, conteoFilas, totalAniones, totalCationes) =
-            infoEstructura(estructura)
+        val (formulaAnionCation, zText, conteoFilas, totalAniones, totalCationes) =
+            infoEstructura(estructura)  // AQUI (9)
 
         val catFormat = formatoCientifico(radioCatCm)
         val anFormat = formatoCientifico(radioAnCm)
@@ -307,7 +274,7 @@ object FuncionesCalculoRadio {
             densidadGcm3Str = "%.2f".format(java.util.Locale.US, densidad),
             formulaAnionCationStr = formulaAnionCation,
             zStr = zText,
-            paso1Lineas = p1Lineas,
+            // AQUI 9
             conteoFilas = conteoFilas,
             totalAniones = totalAniones,
             totalCationes = totalCationes

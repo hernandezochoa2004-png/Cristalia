@@ -131,11 +131,7 @@ internal fun EsqueletoResultadoDensidad(
 /** Contenido del paso 1: tabla de conteo de iones (o el texto antiguo si no hay tabla). */
 @Composable
 internal fun Paso1ConteoIones(estructura: EstructuraCristalina, datos: DatosCalculoRadio) {
-    if (datos.conteoFilas.isNotEmpty()) {
-        ConteoIonesContent(estructura = estructura, datos = datos)
-    } else {
-        LineasConteoTexto(datos.paso1Lineas)
-    }
+    ConteoIonesContent(estructura = estructura, datos = datos)
 }
 
 /** Contenido del paso 2: unidad fórmula y Z. */
@@ -749,21 +745,3 @@ private fun ItemResumenIon(color: Color, texto: String, valor: Int) {
     }
 }
 
-/** Diseño anterior (texto), se usa solo si la estructura no tiene tabla de conteo. */
-@Composable
-internal fun LineasConteoTexto(lineas: List<String>) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        lineas.forEach { linea ->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Black.copy(alpha = 0.35f))
-                    .border(1.dp, BordeApagado.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                    .padding(10.dp)
-            ) {
-                Text(linea, color = Color.White, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
-            }
-        }
-    }
-}

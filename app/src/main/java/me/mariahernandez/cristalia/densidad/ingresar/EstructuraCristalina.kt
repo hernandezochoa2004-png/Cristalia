@@ -52,7 +52,9 @@ data class EstructuraCristalina(
     val sistema: SistemaCristalino,
     val relacionRadioParametro: RelacionRadioParametro,
     val z: Int,
-    val requiereDosRadios: Boolean = true,
+
+    // AQUI (1)
+
     val requiereParametroC: Boolean = false,
     val prismaHexagonal: Boolean = false,   // true = celda = prisma hexagonal completo: V = (3√3/2)·a²·c
     val formulaRelacionTexto: String,
@@ -173,7 +175,7 @@ data class EstructuraCristalina(
                 grupoRelacion = "AB",
                 sistema = SistemaCristalino.CUBICO,
                 relacionRadioParametro = RelacionRadioParametro.BCC_DIAGONAL,
-                z = 2,
+                z = 1,
                 formulaRelacionTexto = "Relación r+/r- para celda BCC: parámetro a = 2(r+ + r-)/√3",
                 modeloGlbAssetPath = "models/densidad/cscl_centrado.glb",
 
