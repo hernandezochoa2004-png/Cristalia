@@ -223,9 +223,10 @@ fun ResultadoDensidadRadioScreen(
 
                 // IMPORTANTE -> Ya que la mayoría utiliza los mismos items, pero cambia el volumen de celda unitaria y aquí permite clasificar
                 when (datos.estructura.id) {
-                    "blenda" -> ContenidoVolumenBlenda(datos)
+                    "blenda", "fluorita" -> ContenidoVolumenBlenda(datos)     // Ya que ambas comparten el mismo volumen de celda unitaria
                     "cscl" -> ContenidoVolumenCsCl(datos)      // <- NUEVA
-                    else -> ContenidoVolumenCelda(datos)
+                    "antifluorita" -> ContenidoVolumenAntifluorita(datos)   // <- NUEVA
+                    else -> ContenidoVolumenCelda(datos)       // NaCl
                 }
             }
 
@@ -400,8 +401,8 @@ private fun glbEncabezado(id: String): String? = when (id) {
     "blenda" -> "models/densidad/blendavolume_centrado_v2.glb"        // "models/densidad/blenda_header.glb"
     "wurtzita" -> "models/densidad/wurtzitavolume_centrado.glb"
     "cscl" -> "models/densidad/csclvolumen_centrado_celda.glb"         // "models/densidad/cscl_header.glb"
-    "fluorita" -> null      // "models/densidad/fluorita_header.glb"
-    "antifluorita" -> null  // "models/densidad/antifluorita_header.glb"
+    "fluorita" -> "models/densidad/fluoritavolume_centrado_celda.glb"    // "models/densidad/fluorita_header.glb"
+    "antifluorita" -> "models/densidad/antifluoritavolume_centrado_celda.glb"  // "models/densidad/antifluorita_header.glb"
     else -> null
 }
 
@@ -595,8 +596,8 @@ private fun glbConteoIones(id: String): String? = when (id) {
     "blenda" -> "models/densidad/blendeatoms_centrado.glb"          // "models/densidad/blenda_atoms.glb"
     "wurtzita" -> "models/densidad/wurtzitatoms_centrado.glb"
     "cscl" -> "models/densidad/csclatoms_centrado.glb"            // "models/densidad/cscl_atoms.glb"
-    "fluorita" -> null        // "models/densidad/fluorita_atoms.glb"
-    "antifluorita" -> null    // "models/densidad/antifluorita_atoms.glb"
+    "fluorita" -> "models/densidad/fluoritatoms_centrado.glb"        // "models/densidad/fluorita_atoms.glb"
+    "antifluorita" -> "models/densidad/antifluoritaatoms_centrado.glb"    // "models/densidad/antifluorita_atoms.glb"
     else -> null
 }
 

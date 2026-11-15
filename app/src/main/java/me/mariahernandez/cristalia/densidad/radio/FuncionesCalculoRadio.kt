@@ -119,8 +119,8 @@ object FuncionesCalculoRadio {
             "blenda" -> Pair("A₄B₄  ➔  4 AB", "z = 4 AB")
             "wurtzita" -> Pair("A₆B₆  ➔  6 AB", "z = 6 UF")
             "cscl" -> Pair("A₂B₂  ➔  2 AB", "z = 2 UF")
-            "fluorita" -> Pair("Ca₄F₈  ➔  4 CaF₂", "z = 4 UF")
-            "antifluorita" -> Pair("Li₈O₄  ➔  4 Li₂O", "z = 4 UF")
+            "fluorita" -> Pair("A₄B₈  ➔  4 AB₂", "z = 4 UF")
+            "antifluorita" -> Pair("A₈B₄  ➔  4 A₂B", "z = 4 UF")
             else -> Pair("${estructura.nombre}  ➔  ${estructura.z} UF", "z = ${estructura.z} UF")
         }
 
@@ -186,13 +186,11 @@ object FuncionesCalculoRadio {
             )
             "fluorita" -> listOf(
                 FilaConteo("Vértices", 8, "⅛", 1, false),
-                FilaConteo("Caras", 6, "½", 3, false),
-                FilaConteo("Huecos tetraédricos", 8, "1", 8, true)
+                FilaConteo("Interior", 4, "1", 4, true)
             )
             "antifluorita" -> listOf(
-                FilaConteo("Vértices", 8, "⅛", 1, true),
-                FilaConteo("Caras", 6, "½", 3, true),
-                FilaConteo("Huecos tetraédricos", 8, "1", 8, false)
+                FilaConteo("Vértices (8 cubos)", 8, "⅛ * 8", 8, false),
+                FilaConteo("Interior (4 cubos)", 1, "1 * 4", 4, true)
             )
             else -> emptyList()
         }
@@ -972,6 +970,111 @@ fun ContenidoVolumenCsCl(datos: DatosCalculoRadio) {
             LineaFormula {
                 TF("V = [ ")
                 FF("1", "√3")
+                TF(" (2 · ${datos.radioCatCmStr} + 2 · ${datos.radioAnCmStr}) ]³")
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Paleta.Cian.copy(alpha = 0.10f))
+                    .border(1.dp, Paleta.Cian.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Text("Volumen total:", color = Color.White, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                Text(
+                    text = "V = ${datos.volumenCm3Str} cm³",
+                    color = Paleta.Cian, fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+
+
+}
+
+
+// ================    ANTIFLUORITA    ==================
+// ---------- Paso 3 para ANTIFLUORITA: a₁ = 2·a₀ (a₀ = arista de la subcelda tipo CsCl), V = a₁³ ----------
+
+@Composable
+fun ContenidoVolumenAntifluorita(datos: DatosCalculoRadio) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+
+        // 1) FÓRMULAS BASE
+        SubTarjeta("FÓRMULAS BASE") {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Caja(modifier = Modifier.weight(1f)) {
+                    TA(Color.White, 13.sp, true) { append("V = a"); sub("1"); append("³") }
+                }
+                Caja(modifier = Modifier.weight(1f)) {
+                    TA(Paleta.Cian, 12.sp, true) { append("a"); sub("1"); append(" = 2 a"); sub("0") }
+                }
+            }
+            Text(
+                "a₀ = arista de una subcelda tipo CsCl (la celda se divide en 8 subcubos)",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+        }
+
+        // 2) DESARROLLO DE a₀ (igual que CsCl)
+        SubTarjeta("DESARROLLO DE a₀ (SUBCELDA)") {
+            LineaFormula {
+                TA { dobleSumaRadios(); append("² = a"); sub("0"); append("² + a"); sub("0"); append("² + a"); sub("0"); append("²") }
+            }
+            LineaFormula {
+                TA { dobleSumaRadios(); append("² = 3a"); sub("0"); append("²") }
+            }
+
+            Text(
+                "Aplicando raíz cuadrada y despejando:",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+            LineaFormula {
+                TA(Color.White, 13.sp, true) { append("a"); sub("0"); append(" = ") }
+                FF("1", "√3", Color.White, 12.sp)
+                TA(Color.White, 13.sp, true) { append(" · "); dobleSumaRadios() }
+            }
+        }
+
+        // 3) a₁ = 2a₀  →  fórmula final
+        SubTarjeta(bordeColor = Paleta.Cian.copy(alpha = 0.3f)) {
+            Text(
+                "Como a₁ = 2a₀, entonces:",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+            LineaFormula {
+                TA(Color.White, 13.sp, true) { append("a"); sub("1"); append(" = ") }
+                FF("2", "√3", Color.White, 12.sp)
+                TA(Color.White, 13.sp, true) { append(" · "); dobleSumaRadios() }
+            }
+            Text(
+                "Y como V = a₁³:",
+                color = TextoApagado, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            )
+            LineaFormula(bordeColor = Paleta.Cian.copy(alpha = 0.3f)) {
+                TF("V = [ ", Paleta.Cian, 16.sp, true)
+                FF("2", "√3", Paleta.Cian, 13.sp)
+                TA(Paleta.Cian, 16.sp, true) { append(" · "); dobleSumaRadios(); append(" ]³") }
+            }
+        }
+
+        // 4) RADIOS IÓNICOS Y CONVERSIÓN
+        SubTarjeta("RADIOS IÓNICOS Y CONVERSIÓN") {
+            FilaRadio("A", "⁺", datos.radioCatPm, datos.radioCatCmStr, ColorCation)
+            FilaRadio("B", "⁻", datos.radioAnPm, datos.radioAnCmStr, ColorAnion)
+        }
+
+        // 5) CÁLCULO DEL VOLUMEN
+        SubTarjeta("CÁLCULO DEL VOLUMEN") {
+            LineaFormula {
+                TF("V = [ ")
+                FF("2", "√3")
                 TF(" (2 · ${datos.radioCatCmStr} + 2 · ${datos.radioAnCmStr}) ]³")
             }
 

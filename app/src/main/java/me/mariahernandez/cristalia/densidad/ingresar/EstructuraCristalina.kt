@@ -192,7 +192,14 @@ data class EstructuraCristalina(
                 relacionRadioParametro = RelacionRadioParametro.FCC_DIAGONAL,
                 z = 4,
                 formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3",
-                modeloGlbAssetPath = "fluorita.glb"
+                modeloGlbAssetPath = "models/densidad/fluorita_centrado.glb",
+
+                compuestosRelacionados = listOf(
+                    CompuestoEjemplo("MF₂ (M = Ca, Cd, Hg, Sn)", "Fluoruros metálicos"),
+                    CompuestoEjemplo("MCl₂ (M = Sr y Ba)", "Cloruros metálicos"),
+                    CompuestoEjemplo("MO₂ (M = Po, Zr, Hf, Ce, Pr, y varios actínidos)", "Dióxidos metálicos"),
+                    CompuestoEjemplo("Dihidruros de metales de transición", "Hidruros metálicos")
+                )
             ),
             EstructuraCristalina(
                 id = "antifluorita",
@@ -203,7 +210,12 @@ data class EstructuraCristalina(
                 relacionRadioParametro = RelacionRadioParametro.FCC_DIAGONAL,
                 z = 4,
                 formulaRelacionTexto = "Relación r+/r- para celda FCC: parámetro a = 4(r+ + r-)/√3",
-                modeloGlbAssetPath = "antifluorita.glb"
+                modeloGlbAssetPath = "models/densidad/antifluorita_centrado.glb",
+
+                compuestosRelacionados = listOf(
+                    CompuestoEjemplo("M₂X (M = Li, Na, K; X = O, S, Se, Te)", "Óxidos y calcogenuros alcalinos"),
+                    CompuestoEjemplo("Rb₂X (X = O, S)", "Compuestos de rubidio")
+                )
             ),
             EstructuraCristalina(
                 id = "yoduro_cadmio",
