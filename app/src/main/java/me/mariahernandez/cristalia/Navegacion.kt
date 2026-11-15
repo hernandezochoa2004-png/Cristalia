@@ -18,6 +18,8 @@ import me.mariahernandez.cristalia.huecos.HuecosScreen
 import com.cristalia.ui.ingresardatos.ModoEntrada
 import me.mariahernandez.cristalia.densidad.parametroa.ResultadoDensidadParametroAScreen
 import me.mariahernandez.cristalia.densidad.volumen.ResultadoDensidadVolumenScreen
+import me.mariahernandez.cristalia.huecos.detalle.DetalleHuecosScreen
+
 
 object Rutas {
 
@@ -41,6 +43,8 @@ object Rutas {
     const val RESULTADO_DENSIDAD_VOLUMEN = "resultado_densidad_volumen/{opcionId}/{masaMolar}/{volumenCelda}"
 
     const val RESULTADO_DENSIDAD_PARAMETRO_A = "resultado_densidad_parametro_a/{opcionId}/{masaMolar}/{parametroA}/{parametroC}"
+
+    const val HUECOS_DETALLE = "huecos_detalle/{opcionId}"
 }
 
 @Composable
@@ -225,11 +229,28 @@ fun AppNavigation() {
         composable(route = Rutas.HUECOS) {
             HuecosScreen(
                 onVolver = { navController.popBackStack() },
+                onIrALogin = { navController.navigate(route = Rutas.LOGIN) },
+                    onOpcionClick = { _, opcionId ->
+                        navController.navigate("huecos_detalle/$opcionId")
+                    }
+            )
+        }
+
+        composable(route = Rutas.HUECOS_DETALLE) { backStackEntry ->
+            val opcionId = backStackEntry.arguments?.getString("opcionId") ?: "fcc"
+
+            DetalleHuecosScreen(
+                opcionId = opcionId,
+                onVolver = { navController.popBackStack() },
                 onIrALogin = { navController.navigate(route = Rutas.LOGIN) }
             )
         }
 
+        }
+
+
+
+
 
 
     }
-}
